@@ -15,7 +15,7 @@ public class StationController {
     private StationRepository stationRepo;
 
     // GET all stations
-    @GetMapping
+    @GetMapping("/get")
     public List<Station> getAllStations() {
         return stationRepo.findAll();
     }
@@ -27,7 +27,7 @@ public class StationController {
     }
 
     // POST create new station
-    @PostMapping
+    @PostMapping("/post")
     public Station createStation(@RequestBody Station station) {
         return stationRepo.save(station);
     }

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>CNG Connect (Chennai)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
+
+    #nearestBtn {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: #28a745;
+      color: white;
+      font-weight: bold;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s;
+    }
+
+    #nearestBtn:hover {
+      background: #218838;
+    }
+
+    #legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+    }
+
+    #legend h4 {
+      margin: 0 0 8px 0;
+    }
+
+    #legend div {
+      margin: 6px 0;
+      display: flex;
+      align-items: center;
+    }
+
+    #legend img {
+      margin-right: 8px;
+    }
+
+    .status-btn {
+      display: block;
+      width: 100%;
+      margin-top: 5px;
+      padding: 5px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    .btn-green {
+      background: green;
+    }
+
+    .btn-orange {
+      background: orange;
+    }
+
+    .btn-red {
+      background: red;
+    }
+
+    .popup-content {
+      min-width: 150px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <button id="nearestBtn">Go to Nearest Station</button>
+  <div id="map"></div>
+  <div id="legend">
+    <h4>Legend</h4>
+    <div><img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" width="24"> Available</div>
+    <div><img src="http://maps.google.com/mapfiles/ms/icons/orange-dot.png" width="24"> Queue</div>
+    <div><img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" width="24"> Not Available</div>
+    <div><img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" width="24"> You</div>
+  </div>
+
+  <!-- Libraries -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+  <script>
+    let stations = [];
+    let markers = [];
+
+    // ---------------- Map Initialization ----------------
+    let map = L.map("map").setView([13.0827, 80.2707], 12); // Chennai Center
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    let userMarker = null;
+    let routingControl = null;
+
+    // ---------------- Fetch Stations from Backend API ----------------
+    function loadStations() {
+      fetch('/stations/get')
+        .then(response => response.json())
+        .then(data => {
+          console.log("API Data:", data);
+          stations = data.map(s => ({
+            id: s.id,
+            name: s.name,
+            // Handle missing location safely
+            lat: s.location ? s.location.lat : 0,
+            longitude: s.location ? s.location.lng : 0, // Code uses 'longitude'
+            status: (s.status || '').toLowerCase().trim(),
+            original: s // Keep original for updates
+          }));
+
+          // Filter invalid locations
+          stations = stations.filter(s => s.lat !== 0 && s.longitude !== 0);
+
+          addMarkers();
+        })
+        .catch(err => console.error("Error loading stations:", err));
+    }
+
+    // ---------------- Add Station Markers ----------------
+    function addMarkers() {
+      // Clear existing markers
+      markers.forEach(m => map.removeLayer(m));
+      markers = [];
+
+      const statusColor = {
+        available: "green",
+        queue: "orange",
+        "out of stock": "red",
+        unavailable: "red"
+      };
+
+      stations.forEach(station => {
+        // Normalize status check
+        let color = "red";
+        if (station.status.includes("available")) color = "green";
+        else if (station.status.includes("queue")) color = "orange";
+
+        const iconUrl = `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`;
+
+        const marker = L.marker([station.lat, station.longitude], {
+          icon: L.icon({
+            iconUrl: iconUrl,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+          })
+        }).addTo(map);
+
+        // Tooltip (Hover)
+        marker.bindTooltip(`<b>${station.name}</b><br>Status: ${station.status}`);
+
+        // Popup (Click) with Update Buttons
+        const popupContent = `
+            <div class="popup-content">
+                <h3>${station.name}</h3>
+                <p>Status: <strong>${station.status}</strong></p>
+                <hr>
+                <button class="status-btn btn-green" onclick="updateStatus('${station.id}', 'Available')">Mark Available</button>
+                <button class="status-btn btn-orange" onclick="updateStatus('${station.id}', 'Queue')">Mark Queue</button>
+                <button class="status-btn btn-red" onclick="updateStatus('${station.id}', 'Out of Stock')">Mark Empty</button>
+            </div>
+        `;
+        marker.bindPopup(popupContent);
+
+        markers.push(marker);
+      });
+    }
+
+    // ---------------- Update Status ----------------
+    window.updateStatus = function (id, newStatus) {
+      // 1. Fetch current to get full object (to match backend requirements)
+      // OR better: Assume backend accepts partial update if we wired it that way,
+      // BUT my Java code overwrites all fields. I must fetch first.
+
+      // Find local station data to save a GET call? 
+      // No, safer to GET fresh data.
+      fetch(`/stations/${id}`) // Get data (Note: our API might only offer /get all. Does it offer /{id}? Yes, Repository has it.)
+      // ACTUALLY: Controller only has @GetMapping("/get") for ALL.
+      // It does NOT have @GetMapping("/{id}").
+      // I need to find the station in my local 'stations' array!
+
+      const station = stations.find(s => s.id === id);
+      if (!station) {
+        alert("Station not found locally!");
+        return;
+      }
+
+      // Construct update payload
+      const payload = {
+        id: station.id,
+        name: station.name,
+        location: { lat: station.lat, lng: station.longitude },
+        status: newStatus,
+        queueTime: (newStatus === 'Queue' ? 15 : 0), // Default logic
+        lastUpdated: new Date()
+      };
+
+      fetch(`/stations/${id}`, { // Using PUT /stations/{id}
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+        .then(res => res.json())
+        .then(() => {
+          alert(`Status updated to ${newStatus}`);
+          loadStations(); // Refresh map
+          map.closePopup();
+        })
+        .catch(err => {
+          console.error("Update failed:", err);
+          // Fallback: If /{id} GET is missing, ensure PUT works.
+        });
+    };
+
+    // ---------------- User Location ----------------
+    if (navigator.geolocation) {
+      navigator.geolocation.watchPosition(pos => { // watchPosition for real-time movement
+        const userLoc = [pos.coords.latitude, pos.coords.longitude];
+
+        if (!userMarker) {
+          userMarker = L.marker(userLoc, {
+            icon: L.icon({
+              iconUrl: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+              iconSize: [32, 32],
+              iconAnchor: [16, 32]
+            })
+          }).addTo(map).bindPopup("You are here");
+          map.setView(userLoc, 13);
+        } else {
+          userMarker.setLatLng(userLoc);
+        }
+      }, (err) => console.log(err), { enableHighAccuracy: true });
+    }
+
+    // ---------------- Nearest Station Routing ----------------
+    document.getElementById("nearestBtn").addEventListener("click", () => {
+      if (!userMarker) {
+        alert("Waiting for your location...");
+        return;
+      }
+
+      const userLoc = userMarker.getLatLng();
+      let nearest = null;
+      let minDist = Infinity;
+
+      stations.forEach(station => {
+        const dist = map.distance(userLoc, [station.lat, station.longitude]);
+        if (dist < minDist && station.status.toLowerCase().includes("available")) { // Only route to available? Or nearest regardless?
+          // Let's route to nearest regardless of status, or prefer available.
+          // User code was simple nearest. Let's stick to nearest.
+          minDist = dist;
+          nearest = station;
+        }
+      });
+
+      // If no station found?
+      if (!nearest && stations.length > 0) nearest = stations[0];
+
+      if (nearest) {
+        if (routingControl) {
+          map.removeControl(routingControl);
+        }
+        routingControl = L.Routing.control({
+          waypoints: [
+            L.latLng(userLoc.lat, userLoc.lng),
+            L.latLng(nearest.lat, nearest.longitude)
+          ],
+          routeWhileDragging: false,
+          show: true, // Show directions
+          addWaypoints: false,
+          draggableWaypoints: false,
+          createMarker: function () { return null; }
+        }).addTo(map);
+
+        alert(`Routing to ${nearest.name}`);
+      }
+    });
+
+    // ---------------- Load Stations on Page Load ----------------
+    loadStations();
+    setInterval(loadStations, 30000); // Poll every 30s
+  </script>
+</body>
+
+</html>

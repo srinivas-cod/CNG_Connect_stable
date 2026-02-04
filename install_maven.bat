@@ -1,0 +1,3 @@
+@echo off
+echo Starting Maven Setup...
+powershell -ExecutionPolicy Bypass -File setup_maven.ps1

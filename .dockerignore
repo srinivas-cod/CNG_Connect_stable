@@ -1,0 +1,7 @@
+target/
+.git/
+.idea/
+.vscode/
+*.bat
+*.ps1
+HELP.md

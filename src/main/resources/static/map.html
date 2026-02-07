@@ -111,6 +111,16 @@
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
   <script>
+    // ---------------- AUTHENTICATION CHECK ----------------
+    const userRole = localStorage.getItem('userRole');
+    if (!userRole) {
+      window.location.href = 'login.html';
+    }
+
+    // ---------------- Route Monitoring Variables ----------------
+    let currentDestinationId = null;
+    let lastAlertedStatus = null; // Prevent spamming alerts
+
     let stations = [];
     let markers = [];
 
@@ -144,8 +154,45 @@
           stations = stations.filter(s => s.lat !== 0 && s.longitude !== 0);
 
           addMarkers();
+          checkRouteStatus(); // Check status after reload
         })
         .catch(err => console.error("Error loading stations:", err));
+    }
+
+    // ---------------- Monitor Active Route ----------------
+    function checkRouteStatus() {
+      if (!currentDestinationId) return;
+
+      const destStation = stations.find(s => s.id === currentDestinationId);
+      if (destStation) {
+        const status = destStation.status.toLowerCase();
+
+        // Alert if status is bad AND we haven't alerted for this specific status yet
+        if ((status.includes('out of stock') || status.includes('unavailable')) && lastAlertedStatus !== status) {
+          alert(`⚠️ WARNING: Your destination "${destStation.name}" is now OUT OF STOCK! Please reroute.`);
+          lastAlertedStatus = status;
+        }
+      }
+    }
+
+    // ---------------- Time Formatter ----------------
+    function timeAgo(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      const now = new Date();
+      const seconds = Math.floor((now - date) / 1000);
+
+      let interval = Math.floor(seconds / 31536000);
+      if (interval > 1) return interval + " years ago";
+      interval = Math.floor(seconds / 2592000);
+      if (interval > 1) return interval + " months ago";
+      interval = Math.floor(seconds / 86400);
+      if (interval > 1) return interval + " days ago";
+      interval = Math.floor(seconds / 3600);
+      if (interval >= 1) return interval + " hours ago";
+      interval = Math.floor(seconds / 60);
+      if (interval >= 1) return interval + " mins ago";
+      return "Just now";
     }
 
     // ---------------- Add Station Markers ----------------
@@ -182,16 +229,24 @@
         marker.bindTooltip(`<b>${station.name}</b><br>Status: ${station.status}`);
 
         // Popup (Click) with Update Buttons
-        const popupContent = `
+        let popupContent = `
             <div class="popup-content">
                 <h3>${station.name}</h3>
                 <p>Status: <strong>${station.status}</strong></p>
+                ${station.lastUpdated ? `<p style="font-size:0.8em; color:gray">Updated: ${timeAgo(station.lastUpdated)}</p>` : ''}
                 <hr>
+        `;
+
+        // Only show buttons if Admin
+        if (userRole === 'ADMIN') {
+          popupContent += `
                 <button class="status-btn btn-green" onclick="updateStatus('${station.id}', 'Available')">Mark Available</button>
                 <button class="status-btn btn-orange" onclick="updateStatus('${station.id}', 'Queue')">Mark Queue</button>
                 <button class="status-btn btn-red" onclick="updateStatus('${station.id}', 'Out of Stock')">Mark Empty</button>
-            </div>
-        `;
+            `;
+        }
+
+        popupContent += `</div>`;
         marker.bindPopup(popupContent);
 
         markers.push(marker);
@@ -305,6 +360,10 @@
         }).addTo(map);
 
         alert(`Routing to ${nearest.name}`);
+
+        // Start monitoring this station
+        currentDestinationId = nearest.id;
+        lastAlertedStatus = null; // Reset alert state
       }
     });
 

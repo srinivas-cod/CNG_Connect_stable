@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CNG Connect</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="logo">CNG Connect</a>
+    </nav>
+
+    <div class="container">
+        <div class="login-card">
+            <h2>Select Access Type</h2>
+
+            <!-- User Access -->
+            <div class="access-option">
+                <h3>For Drivers</h3>
+                <p>Find stations, check status, and navigate.</p>
+                <button onclick="loginAsUser()" class="btn btn-primary full-width">Continue as User</button>
+            </div>
+
+            <div class="divider">OR</div>
+
+            <!-- Admin Access -->
+            <div class="access-option">
+                <h3>For Station Managers</h3>
+                <p>Update station status and availability.</p>
+                <form onsubmit="handleAdminLogin(event)" class="login-form">
+                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required>
+                    <button type="submit" class="btn btn-secondary full-width">Login as Admin</button>
+                </form>
+                <p id="error-msg" class="error-msg"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Clear any existing session on load
+        localStorage.removeItem('userRole');
+
+        function loginAsUser() {
+            localStorage.setItem('userRole', 'USER');
+            window.location.href = 'map.html';
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('adminPassword').value;
+            const errorMsg = document.getElementById('error-msg');
+
+            // Simple frontend check as requested
+            if (password === 'admin123') {
+                localStorage.setItem('userRole', 'ADMIN');
+                window.location.href = 'map.html';
+            } else {
+                errorMsg.textContent = "Invalid Password";
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>

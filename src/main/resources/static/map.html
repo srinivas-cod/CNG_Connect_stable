@@ -1590,11 +1590,26 @@
 
           let startLatLng;
           if (start === 'My Current Location') {
-            // Wait for GPS if possible, else use default search
+            // Helper to wait for GPS
+            const waitGPS = () => new Promise(resolve => {
+                let attempts = 0;
+                const check = setInterval(() => {
+                    attempts++;
+                    if(userMarker) {
+                        clearInterval(check);
+                        resolve(userMarker.getLatLng());
+                    }
+                    if(attempts > 10) { // Timeout after 5s
+                        clearInterval(check);
+                        resolve({lat: 13.0827, lng: 80.2707}); // Fallback to Chennai
+                    }
+                }, 500);
+            });
+            
             if (userMarker) {
               startLatLng = userMarker.getLatLng();
             } else {
-              startLatLng = await getCoordinates(start);
+              startLatLng = await waitGPS();
             }
           } else {
             startLatLng = await getCoordinates(start);

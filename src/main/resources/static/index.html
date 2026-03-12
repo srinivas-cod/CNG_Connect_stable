@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="author" content="Srinivas">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -237,7 +238,7 @@
             </div>
         </div>
         <div class="footer-bottom">
-            &copy; 2026 CNG Connect. <span id="rights">All rights reserved.</span> 🇮🇳
+            &copy; 2026 CNG Connect. <span id="rights">All rights reserved.</span> <span id="dev-credit">Designed & Developed by Srinivas</span> 🇮🇳
         </div>
     </footer>
 
@@ -309,7 +310,8 @@
                 footerLegal: 'Legal',
                 linkPriv: 'Privacy Policy',
                 linkTerms: 'Terms of Use',
-                rights: 'All rights reserved.'
+                rights: 'All rights reserved.',
+                devCredit: 'Designed & Developed by Srinivas'
             },
             'ta-IN': {
                 navHome: 'முகப்பு',
@@ -377,7 +379,8 @@
                 footerLegal: 'சட்ட',
                 linkPriv: 'தனியுரிமைக் கொள்கை',
                 linkTerms: 'பயன்பாட்டு விதிமுறைகள்',
-                rights: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.'
+                rights: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
+                devCredit: 'வடிவமைப்பு மற்றும் மேம்பாடு: ஸ்ரீனிவாஸ்'
             }
         };
 
@@ -460,6 +463,7 @@
             document.getElementById('link-priv').innerText = labels.linkPriv;
             document.getElementById('link-terms').innerText = labels.linkTerms;
             document.getElementById('rights').innerText = labels.rights;
+            document.getElementById('dev-credit').innerText = labels.devCredit;
         }
 
         window.addEventListener('DOMContentLoaded', () => {

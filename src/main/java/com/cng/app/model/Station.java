@@ -1,6 +1,5 @@
 package com.cng.app.model;
 
-import jakarta.annotation.Generated;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
@@ -16,8 +15,18 @@ public class Station {
     private int queueTime;
     private Date lastUpdated;
     private String adminId;
-    public Station() {
+    private String fuelType; // CNG, EV_CHARGER, etc.
+    
+    // EV Specific Fields
+    private String evPowerKW;      // e.g., "60kW DC"
+    private String connectorTypes;  // e.g., "CCS2, Type 2"
+    private String operator;        // e.g., "Tata Power", "Jio-bp"
+    private boolean verified;       // True if updated by Admin
+    private String lastUpdatedByRole; // "ADMIN" or "USER"
 
+    public Station() {
+        this.fuelType = "CNG"; 
+        this.verified = false;
     }
 
     // Inner class for coordinates
@@ -61,4 +70,22 @@ public class Station {
 
     public String getAdminId() { return adminId; }
     public void setAdminId(String adminId) { this.adminId = adminId; }
+
+    public String getFuelType() { return fuelType; }
+    public void setFuelType(String fuelType) { this.fuelType = fuelType; }
+
+    public String getEvPowerKW() { return evPowerKW; }
+    public void setEvPowerKW(String evPowerKW) { this.evPowerKW = evPowerKW; }
+
+    public String getConnectorTypes() { return connectorTypes; }
+    public void setConnectorTypes(String connectorTypes) { this.connectorTypes = connectorTypes; }
+
+    public String getOperator() { return operator; }
+    public void setOperator(String operator) { this.operator = operator; }
+
+    public boolean isVerified() { return verified; }
+    public void setVerified(boolean verified) { this.verified = verified; }
+
+    public String getLastUpdatedByRole() { return lastUpdatedByRole; }
+    public void setLastUpdatedByRole(String lastUpdatedByRole) { this.lastUpdatedByRole = lastUpdatedByRole; }
 }

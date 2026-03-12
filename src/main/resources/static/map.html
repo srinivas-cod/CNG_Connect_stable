@@ -1,375 +1,1623 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>CNG Connect (Chennai)</title>
+  <meta charset="UTF-8">
+  <title>CNG Connect | Smart Wayfinding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: hsl(142, 71%, 45%);
+      --primary-dark: hsl(142, 71%, 35%);
+      --secondary: hsl(210, 100%, 50%);
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --glass: rgba(255, 255, 255, 0.85);
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    }
+
+    .night-mode {
+      --dark: #f8fafc;
+      --light: #0f172a;
+      --glass: rgba(15, 23, 42, 0.9);
+      background: #020617;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes pulse-sos {
+      0% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+      }
+
+      70% {
+        box-shadow: 0 0 0 15px rgba(244, 63, 94, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+      }
+    }
+
     body {
       margin: 0;
       padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Outfit', sans-serif;
+      overflow: hidden;
+      background: var(--light);
     }
 
     #map {
       height: 100vh;
       width: 100%;
+      z-index: 1;
     }
 
-    #nearestBtn {
+    /* --- Floating Header Controls --- */
+    .header-controls {
       position: absolute;
-      top: 10px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background: #28a745;
-      color: white;
-      font-weight: bold;
-      padding: 12px 20px;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      transition: background 0.3s;
-    }
-
-    #nearestBtn:hover {
-      background: #218838;
-    }
-
-    #legend {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 14px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      z-index: 1000;
-    }
-
-    #legend h4 {
-      margin: 0 0 8px 0;
-    }
-
-    #legend div {
-      margin: 6px 0;
       display: flex;
+      gap: 15px;
+      width: 95%;
+      max-width: 600px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-directions:hover {
+      transform: translateY(-1px);
+      background: #2563eb;
+    }
+
+    /* --- TRIP PLANNER UI (Uber/Ola Style) --- */
+    /* .trip-planner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 12px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .trip-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      position: relative;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+    }
+
+    .line-connector {
+      position: absolute;
+      left: 6px;
+      top: 22px;
+      bottom: 22px;
+      width: 1px;
+      border-left: 2px dotted #94a3b8;
+      z-index: 0;
+    }
+
+    .dot-start {
+      color: var(--secondary);
+      z-index: 1;
+      font-size: 12px;
+    }
+
+    .dot-end {
+      color: #f43f5e;
+      z-index: 1;
+      font-size: 12px;
+    }
+
+    .trip-inputs input {
+      border: none;
+      background: transparent;
+      padding: 14px 0;
+      width: 100%;
+      font-size: 17px;
+      font-weight: 600;
+      outline: none;
+      color: var(--dark);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .trip-inputs input::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    } */
+
+    .main-action-btn {
+      align-self: center;
+      margin-left: 15px;
+      padding: 20px 35px;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .btn-directions:hover {
+      transform: translateY(-1px);
+      background: #2563eb;
+    }
+
+    @media (max-width: 600px) {
+      .header-controls {
+        flex-direction: column;
+        top: 10px;
+        gap: 8px;
+      }
+
+      .btn-icon {
+        width: 100%;
+        margin-left: 0 !important;
+        padding: 18px !important;
+      }
+
+      .side-panel {
+        width: 100% !important;
+        right: 0 !important;
+        top: auto !important;
+        bottom: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 50vh !important;
+      }
+
+      .nav-placeholder {
+        font-size: 14px;
+      }
+    }
+
+    .search-box {
+      flex: 1;
+      display: flex;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 8px 16px;
+      box-shadow: var(--shadow);
       align-items: center;
     }
 
-    #legend img {
-      margin-right: 8px;
-    }
-
-    .status-btn {
-      display: block;
-      width: 100%;
-      margin-top: 5px;
-      padding: 5px;
+    .search-box input {
       border: none;
+      background: transparent;
+      padding: 10px;
+      width: 100%;
+      font-size: 16px;
+      outline: none;
+      color: var(--dark);
+    }
+
+    /* --- TRIP PLANNER UI (Uber/Ola Style) --- */
+    /* .trip-planner, .trip-inputs, .input-row, .line-connector, .dot-start, .dot-end, .trip-inputs input, .trip-inputs input::placeholder are no longer used */
+
+    /* Removed duplicate .main-action-btn */
+
+    .btn-icon {
+      background: var(--primary);
       color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
       cursor: pointer;
-      border-radius: 3px;
+      font-weight: 600;
+      transition: all 0.2s;
+      white-space: nowrap;
     }
 
-    .btn-green {
-      background: green;
+    .btn-icon:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
     }
 
-    .btn-orange {
-      background: orange;
+    /* --- Side Panel --- */
+    .side-panel {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      width: 320px;
+      max-height: calc(100vh - 140px);
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .btn-red {
-      background: red;
+    .panel-header {
+      padding: 20px;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .popup-content {
-      min-width: 150px;
+    .panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      color: var(--dark);
+    }
+
+    .waypoint-list {
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .waypoint-card {
+      background: white;
+      margin-bottom: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .waypoint-card:hover {
+      border-color: var(--primary);
+    }
+
+    .wp-number {
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .wp-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .wp-remove {
+      color: #f87171;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    .panel-footer {
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.5);
+      border-top: 1px solid #e2e8f0;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-family: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      color: var(--dark);
+    }
+
+    /* --- Legend & Map Overlays --- */
+    .map-overlay {
+      position: absolute;
+      bottom: 30px;
+      left: 20px;
+      background: var(--glass);
+      backdrop-filter: blur(8px);
+      padding: 15px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 6px 0;
+      color: var(--dark);
+      font-weight: 500;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 0 2px white, 0 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .bg-green {
+      background: #22c55e;
+    }
+
+    .bg-orange {
+      background: #f59e0b;
+    }
+
+    .bg-red {
+      background: #ef4444;
+    }
+
+    .bg-blue {
+      background: #3b82f6;
+    }
+
+    /* Journey Legend Styles */
+    .journey-timeline {
+      position: relative;
+      padding-left: 30px;
+      margin: 15px 0;
+    }
+
+    .journey-timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e2e8f0;
+      z-index: 0;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+      z-index: 1;
+    }
+
+    .timeline-marker {
+      position: absolute;
+      left: -24px;
+      top: 2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid var(--primary);
+    }
+
+    .timeline-item.origin .timeline-marker {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+
+    .timeline-item.destination .timeline-marker {
+      background: #ef4444;
+      border-color: #ef4444;
+    }
+
+    .timeline-content {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .timeline-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #1e293b;
+      /* Dark Slate in Light Mode */
+    }
+
+    .timeline-info {
+      font-size: 12px;
+      color: #475569;
+      /* Slate Gray in Light Mode */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-available {
+      background: #22c55e;
+      color: white;
+      box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+    }
+
+    .status-queue {
+      background: #f59e0b;
+      color: white;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+
+    .status-closed {
+      background: #ef4444;
+      color: white;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+
+    /* --- Navigation Instructions --- */
+    .nav-tabs {
+      display: flex;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      margin: 10px;
+    }
+
+    .nav-tab {
+      flex: 1;
+      padding: 8px;
       text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+      color: #64748b;
+    }
+
+    .nav-tab.active {
+      background: white;
+      color: var(--primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .directions-container,
+    .waypoint-list {
+      display: none;
+      padding: 10px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .directions-container.active,
+    .waypoint-list.active {
+      display: block;
+    }
+
+    .direction-step {
+      display: flex;
+      gap: 15px;
+      padding: 12px;
+      border-bottom: 1px solid #f1f5f9;
+      align-items: flex-start;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .direction-step:hover {
+      background: #f8fafc;
+    }
+
+    .step-icon {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+      color: var(--secondary);
+    }
+
+    .step-text {
+      flex: 1;
+      font-size: 13px;
+      color: var(--dark);
+      line-height: 1.4;
+    }
+
+    .step-dist {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* --- Popup Styles --- */
+    .custom-popup .leaflet-popup-content-wrapper {
+      border-radius: 16px;
+      padding: 5px;
+    }
+
+    .popup-body {
+      text-align: center;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .popup-body h3 {
+      margin: 10px 0 5px;
+      font-size: 16px;
+    }
+
+    .popup-body p {
+      margin: 0 0 15px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .admin-controls {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+
+    /* --- Routing Progress --- */
+    .route-meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+      text-align: center;
+      background: #f1f5f9;
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    /* --- SOS & Night Controls --- */
+    .sos-btn {
+      position: absolute;
+      bottom: 120px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: #f43f5e;
+      color: white;
+      border-radius: 50%;
+      border: none;
+      z-index: 1000;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      box-shadow: 0 10px 20px rgba(244, 63, 94, 0.4);
+      animation: pulse-sos 2s infinite;
+      transition: transform 0.2s;
+    }
+
+    .sos-btn:active {
+      transform: scale(0.9);
+    }
+
+    .night-toggle {
+      background: var(--dark);
+      color: var(--light);
+      padding: 8px 15px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .night-mode .timeline-content {
+      background: #1e293b;
+      border-color: #334155;
+    }
+
+    .night-mode .timeline-title {
+      color: #ffffff;
+      /* Pure White in Dark Mode */
+    }
+
+    .night-mode .timeline-info {
+      color: #cbd5e1;
+      /* Light Slate in Dark Mode */
+    }
+
+    .night-mode .step-text {
+      color: #f1f5f9;
+    }
+
+    .night-mode .panel-header h2 {
+      color: white;
+    }
+
+    /* Leaflet UI Overrides */
+    .leaflet-routing-container {
+      display: none !important;
+      /* We use our custom list */
     }
   </style>
 </head>
 
 <body>
-  <button id="nearestBtn">Go to Nearest Station</button>
-  <div id="map"></div>
-  <div id="legend">
-    <h4>Legend</h4>
-    <div><img src="http://maps.google.com/mapfiles/ms/icons/green-dot.png" width="24"> Available</div>
-    <div><img src="http://maps.google.com/mapfiles/ms/icons/orange-dot.png" width="24"> Queue</div>
-    <div><img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" width="24"> Not Available</div>
-    <div><img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" width="24"> You</div>
+  <!-- Professional Floating Sidebar (Search) -->
+  <div class="header-controls">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Enter destination (e.g. Marina Mall)...">
+      <button class="btn-icon" id="searchBtn">Search</button>
+    </div>
+    <div class="voice-controls" style="display: flex; gap: 8px;">
+      <select id="voiceLang" class="night-toggle"
+        style="background: white; color: var(--dark); border: 1px solid #e2e8f0;">
+        <option value="en-US">English</option>
+        <option value="ta-IN">தமிழ் (Tamil)</option>
+      </select>
+      <button id="voiceToggle" class="night-toggle" style="background: var(--primary); color: white; border: none;">
+        🔊 Voice On
+      </button>
+    </div>
+    <button class="btn-icon" id="nearestBtn" style="background: var(--dark);">Nearest Gas</button>
   </div>
 
-  <!-- Libraries -->
+  <button class="sos-btn" id="sosBtn">
+    <span style="font-size: 18px;">🚨</span>
+    <span>SOS</span>
+  </button>
+
+  <!-- Perspective Side Panel -->
+  <div class="side-panel" id="sidePanel">
+    <div class="panel-header">
+      <h2 id="panelTitle">Journey Legend</h2>
+      <span style="font-size: 20px; cursor:pointer" id="togglePanel">⌵</span>
+    </div>
+
+    <div class="nav-tabs">
+      <div class="nav-tab active" id="tabStops">Route Stops</div>
+      <div class="nav-tab" id="tabDirections">Directions</div>
+    </div>
+
+    <div class="waypoint-list active" id="waypointList">
+      <!-- Waypoints dynamically injected -->
+      <p style="text-align:center; color: #94a3b8; padding: 20px;">No active journey. Search a destination to begin.</p>
+    </div>
+
+    <div class="directions-container" id="directionsList">
+      <!-- Directions dynamically injected -->
+      <p style="text-align:center; color: #94a3b8; padding: 20px;">Search a destination to see step-by-step turns.</p>
+    </div>
+
+    <div class="panel-footer">
+      <div id="routeStats" class="route-meta" style="display:none">
+        Dist: <span id="distVal">--</span> | Est: <span id="timeVal">--</span>
+      </div>
+      <button class="action-btn btn-primary" id="generateBtn">Explore Stations</button>
+      <button class="action-btn btn-outline" id="clearBtn">Clear All</button>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="map-overlay">
+    <h4
+      style="margin: 0 0 10px 0; font-size: 14px; font-weight: 700; color: var(--dark); border-bottom: 2px solid #e2e8f0; padding-bottom: 5px;">
+      CNG Station Status</h4>
+    <div class="legend-item"><span class="dot bg-green"></span> <b>Operational</b> (Available)</div>
+    <div class="legend-item"><span class="dot bg-orange"></span> <b>Live Queue</b> (Wait time)</div>
+    <div class="legend-item"><span class="dot bg-red"></span> <b>Out of Service</b> (Empty)</div>
+    <div class="legend-item"><span class="dot bg-blue"></span> Your Location</div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
   <script>
-    // ---------------- AUTHENTICATION CHECK ----------------
+    // 1. Config & State
     const userRole = localStorage.getItem('userRole');
-    if (!userRole) {
-      window.location.href = 'login.html';
-    }
+    // We will check this inside our initialization
 
-    // ---------------- Route Monitoring Variables ----------------
-    let currentDestinationId = null;
-    let lastAlertedStatus = null; // Prevent spamming alerts
+    let map, userMarker, stations = [], waypoints = [], routingControl = null;
+    let monitoredStations = new Set();
+    let isDriving = false;
+    let isNightMode = false;
+    let baseTiles = null;
+    let voiceEnabled = true;
 
-    let stations = [];
-    let markers = [];
-
-    // ---------------- Map Initialization ----------------
-    let map = L.map("map").setView([13.0827, 80.2707], 12); // Chennai Center
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
-
-    let userMarker = null;
-    let routingControl = null;
-
-    // ---------------- Fetch Stations from Backend API ----------------
-    function loadStations() {
-      fetch('/stations/get')
-        .then(response => response.json())
-        .then(data => {
-          console.log("API Data:", data);
-          stations = data.map(s => ({
-            id: s.id,
-            name: s.name,
-            // Handle missing location safely
-            lat: s.location ? s.location.lat : 0,
-            longitude: s.location ? s.location.lng : 0, // Code uses 'longitude'
-            status: (s.status || '').toLowerCase().trim(),
-            original: s // Keep original for updates
-          }));
-
-          // Filter invalid locations
-          stations = stations.filter(s => s.lat !== 0 && s.longitude !== 0);
-
-          addMarkers();
-          checkRouteStatus(); // Check status after reload
-        })
-        .catch(err => console.error("Error loading stations:", err));
-    }
-
-    // ---------------- Monitor Active Route ----------------
-    function checkRouteStatus() {
-      if (!currentDestinationId) return;
-
-      const destStation = stations.find(s => s.id === currentDestinationId);
-      if (destStation) {
-        const status = destStation.status.toLowerCase();
-
-        // Alert if status is bad AND we haven't alerted for this specific status yet
-        if ((status.includes('out of stock') || status.includes('unavailable')) && lastAlertedStatus !== status) {
-          alert(`⚠️ WARNING: Your destination "${destStation.name}" is now OUT OF STOCK! Please reroute.`);
-          lastAlertedStatus = status;
-        }
+    const uiLabels = {
+      'en-US': {
+        panelTitle: 'Journey Legend',
+        tabStops: 'Route Stops',
+        tabDirections: 'Directions',
+        clearBtn: 'Clear All',
+        generateBtn: 'Explore Stations',
+        searchBtn: 'Search',
+        nearestBtn: 'Nearest Gas',
+        searchInput: 'Enter destination...',
+        voiceOn: '🔊 Voice On',
+        voiceOff: '🔇 Voice Off',
+        km: 'km',
+        min: 'min',
+        goHere: 'Go Here',
+        navigate: 'Navigate Here',
+        evNavigate: '⚡ Navigate to Hub',
+        lastVerified: 'Last Verified',
+        official: 'Official Verification',
+        community: 'Community Report',
+        verifyBtn: 'Verify',
+        justNow: 'Just Now',
+        noJourney: 'No active journey. Search a destination to begin.',
+        noDirections: 'Search a destination to see step-by-step turns.',
+        currentLoc: 'Current Location',
+        plannedStop: 'Planned Stop',
+        origin: 'Departure Point',
+        destination: 'Final Arrival',
+        stationsFound: 'Stations Found Along Path',
+        viewOnMap: 'View on Map',
+        add: '+ ADD',
+        reportStatus: 'REPORT LIVE STATUS',
+        noQ: 'NO Q',
+        mt: 'MT'
+      },
+      'ta-IN': {
+        panelTitle: 'பயண விபரம்',
+        tabStops: 'நிறுத்தங்கள்',
+        tabDirections: 'வழிமுறைகள்',
+        clearBtn: 'அனைத்தையும் நீக்குக',
+        generateBtn: 'நிலையங்களைக் கண்டறிக',
+        searchBtn: 'தேடுக',
+        nearestBtn: 'அருகிலுள்ள பங்க்',
+        searchInput: 'செல்ல வேண்டிய இடத்தை தேர்வு செய்க...',
+        voiceOn: '🔊 குரல் இயக்கு',
+        voiceOff: '🔇 குரல் நிறுத்து',
+        km: 'கி.மீ',
+        min: 'நிமிடம்',
+        goHere: 'இங்கு செல்லவும்',
+        navigate: 'வழிசெலுத்துக',
+        evNavigate: '⚡ மின்னூட்டும் நிலையத்திற்குச் செல்க',
+        lastVerified: 'கடைசியாகச் சரிபார்க்கப்பட்டது',
+        justNow: 'இப்பொழுது',
+        noJourney: 'பயணங்கள் ஏதுமில்லை. தொடங்குவதற்கு இலக்கைத் தேடவும்.',
+        noDirections: 'வழிமுறைகளைக் காண இலக்கைத் தேடவும்.',
+        currentLoc: 'தற்போதைய இடம்',
+        plannedStop: 'திட்டமிடப்பட்ட நிறுத்தம்',
+        origin: 'புறப்படும் இடம்',
+        destination: 'போய்ச்சேரும் இடம்',
+        stationsFound: 'பாதையில் உள்ள நிலையங்கள்',
+        viewOnMap: 'வரைபடத்தில் காண்க',
+        add: '+ சேர்',
+        reportStatus: 'நேரடி நிலை அறிக்கை',
+        noQ: 'வழி உள்ளது',
+        mt: 'இல்லை',
+        sosTarget: 'அவசரம்: நிலையத்திற்கு வழிசெலுத்துகின்றது',
+        sosFail: 'செயல்படும் நிலையங்கள் எதுவும் அருகாமையில் இல்லை!',
+        loadingGeo: '🔄 உங்கள் பாதையை உறுதிசெய்கிறது...',
+        resetAva: 'சரி செய்க',
+        hAgo: 'மணி நேரம் முன்',
+        mAgo: 'நிமிடம் முன்',
+        sAgo: 'வினாடி முன்',
+        statusUpdated: 'நிலை மாற்றப்பட்டது',
+        outOfStockAlert: 'இருப்பு இல்லை என அறிவிக்கப்பட்டது',
+        official: 'அதிகாரப்பூர்வ சரிபார்ப்பு',
+        community: 'சமூக அறிக்கை',
+        verifyBtn: 'சரிபார்'
       }
-    }
-
-    // ---------------- Time Formatter ----------------
-    function timeAgo(dateString) {
-      if (!dateString) return '';
-      const date = new Date(dateString);
-      const now = new Date();
-      const seconds = Math.floor((now - date) / 1000);
-
-      let interval = Math.floor(seconds / 31536000);
-      if (interval > 1) return interval + " years ago";
-      interval = Math.floor(seconds / 2592000);
-      if (interval > 1) return interval + " months ago";
-      interval = Math.floor(seconds / 86400);
-      if (interval > 1) return interval + " days ago";
-      interval = Math.floor(seconds / 3600);
-      if (interval >= 1) return interval + " hours ago";
-      interval = Math.floor(seconds / 60);
-      if (interval >= 1) return interval + " mins ago";
-      return "Just now";
-    }
-
-    // ---------------- Add Station Markers ----------------
-    function addMarkers() {
-      // Clear existing markers
-      markers.forEach(m => map.removeLayer(m));
-      markers = [];
-
-      const statusColor = {
-        available: "green",
-        queue: "orange",
-        "out of stock": "red",
-        unavailable: "red"
-      };
-
-      stations.forEach(station => {
-        // Normalize status check
-        let color = "red";
-        if (station.status.includes("available")) color = "green";
-        else if (station.status.includes("queue")) color = "orange";
-
-        const iconUrl = `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`;
-
-        const marker = L.marker([station.lat, station.longitude], {
-          icon: L.icon({
-            iconUrl: iconUrl,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
-          })
-        }).addTo(map);
-
-        // Tooltip (Hover)
-        marker.bindTooltip(`<b>${station.name}</b><br>Status: ${station.status}`);
-
-        // Popup (Click) with Update Buttons
-        let popupContent = `
-            <div class="popup-content">
-                <h3>${station.name}</h3>
-                <p>Status: <strong>${station.status}</strong></p>
-                ${station.lastUpdated ? `<p style="font-size:0.8em; color:gray">Updated: ${timeAgo(station.lastUpdated)}</p>` : ''}
-                <hr>
-        `;
-
-        // Only show buttons if Admin
-        if (userRole === 'ADMIN') {
-          popupContent += `
-                <button class="status-btn btn-green" onclick="updateStatus('${station.id}', 'Available')">Mark Available</button>
-                <button class="status-btn btn-orange" onclick="updateStatus('${station.id}', 'Queue')">Mark Queue</button>
-                <button class="status-btn btn-red" onclick="updateStatus('${station.id}', 'Out of Stock')">Mark Empty</button>
-            `;
-        }
-
-        popupContent += `</div>`;
-        marker.bindPopup(popupContent);
-
-        markers.push(marker);
-      });
-    }
-
-    // ---------------- Update Status ----------------
-    window.updateStatus = function (id, newStatus) {
-      // 1. Fetch current to get full object (to match backend requirements)
-      // OR better: Assume backend accepts partial update if we wired it that way,
-      // BUT my Java code overwrites all fields. I must fetch first.
-
-      // Find local station data to save a GET call? 
-      // No, safer to GET fresh data.
-      fetch(`/stations/${id}`) // Get data (Note: our API might only offer /get all. Does it offer /{id}? Yes, Repository has it.)
-      // ACTUALLY: Controller only has @GetMapping("/get") for ALL.
-      // It does NOT have @GetMapping("/{id}").
-      // I need to find the station in my local 'stations' array!
-
-      const station = stations.find(s => s.id === id);
-      if (!station) {
-        alert("Station not found locally!");
-        return;
-      }
-
-      // Construct update payload
-      const payload = {
-        id: station.id,
-        name: station.name,
-        location: { lat: station.lat, lng: station.longitude },
-        status: newStatus,
-        queueTime: (newStatus === 'Queue' ? 15 : 0), // Default logic
-        lastUpdated: new Date()
-      };
-
-      fetch(`/stations/${id}`, { // Using PUT /stations/{id}
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-        .then(res => res.json())
-        .then(() => {
-          alert(`Status updated to ${newStatus}`);
-          loadStations(); // Refresh map
-          map.closePopup();
-        })
-        .catch(err => {
-          console.error("Update failed:", err);
-          // Fallback: If /{id} GET is missing, ensure PUT works.
-        });
     };
 
-    // ---------------- User Location ----------------
-    if (navigator.geolocation) {
-      navigator.geolocation.watchPosition(pos => { // watchPosition for real-time movement
-        const userLoc = [pos.coords.latitude, pos.coords.longitude];
+    const tamilNav = {
+      "head northeast": "வடகிழக்கு நோக்கிச் செல்லுங்கள்",
+      "head northwest": "வடமேற்கு நோக்கிச் செல்லுங்கள்",
+      "head southeast": "தென்கிழக்கு நோக்கிச் செல்லுங்கள்",
+      "head southwest": "தென்மேற்கு நோக்கிச் செல்லுங்கள்",
+      "head north": "வடக்கு நோக்கிச் செல்லுங்கள்",
+      "head south": "தெற்கு நோக்கிச் செல்லுங்கள்",
+      "head east": "கிழக்கு நோக்கிச் செல்லுங்கள்",
+      "head west": "மேற்கு நோக்கிச் செல்லுங்கள்",
+      "head": "நேராகச் செல்லுங்கள்",
+      "toward": "நோக்கி",
+      "turn left": "இடதுபுறம் திரும்புங்கள்",
+      "turn right": "வலதுபுறம் திரும்புங்கள்",
+      "keep left": "இடதுபுறமாகவே செல்லுங்கள்",
+      "keep right": "வலதுபுறமாகவே செல்லுங்கள்",
+      "straight": "நேராகச் செல்லுங்கள்",
+      "destination": "நீங்கள் இலக்கை அடைந்துவிட்டீர்கள்",
+      "arrive": "வந்துவிட்டீர்கள்",
+      "arrival": "வந்துவிட்டீர்கள்",
+      "sharp left": "கூர்மையாக இடதுபுறம் திரும்புங்கள்",
+      "sharp right": "கூர்மையாக வலதுபுறம் திரும்புங்கள்",
+      "slight left": "சற்று இடதுபுறம் திரும்புங்கள்",
+      "slight right": "சற்று வலதுபுறம் திரும்புங்கள்",
+      "roundabout": "சுற்றுவழியில்",
+      "at": "அருகில்",
+      "on": "இல்",
+      "onto": "நோக்கி",
+      "exit": "வெளியேறுங்கள்",
+      "take the": "எடுங்கள்",
+      "continue": "தொடர்ந்து செல்லுங்கள்",
+      "voice navigation enabled": "குரல் வழிகாட்டுதல் இயக்கப்பட்டது",
+      "voice navigation disabled": "குரல் வழிகாட்டுதல் நிறுத்தப்பட்டது",
+      "meters": "மீட்டர்",
+      "kilometer": "கி.மீ",
+      "kilometers": "கி.மீ"
+    };
 
-        if (!userMarker) {
-          userMarker = L.marker(userLoc, {
-            icon: L.icon({
-              iconUrl: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-              iconSize: [32, 32],
-              iconAnchor: [16, 32]
-            })
-          }).addTo(map).bindPopup("You are here");
-          map.setView(userLoc, 13);
-        } else {
-          userMarker.setLatLng(userLoc);
-        }
-      }, (err) => console.log(err), { enableHighAccuracy: true });
+    function translateToTamil(text) {
+      let t = text.toLowerCase();
+
+      const turnOnto = /turn (left|right) onto (.+)/i;
+      if (turnOnto.test(t)) {
+        const m = t.match(turnOnto);
+        const dir = m[1] === 'left' ? 'இடதுபுறம்' : 'வலதுபுறம்';
+        return `${m[2]} நோக்கி ${dir} திரும்புங்கள்`;
+      }
+
+      const headOn = /head (northeast|northwest|southeast|southwest|north|south|east|west) on (.+)/i;
+      if (headOn.test(t)) {
+        const m = t.match(headOn);
+        const dirs = {
+          'north': 'வடக்கு', 'south': 'தெற்கு', 'east': 'கிழக்கு', 'west': 'மேற்கு',
+          'northeast': 'வடகிழக்கு', 'northwest': 'வடமேற்கு', 'southeast': 'தென்கிழக்கு', 'southwest': 'தென்மேற்கு'
+        };
+        return `${m[2]}-இல் ${dirs[m[1]]} நோக்கிச் செல்லுங்கள்`;
+      }
+
+      const contOnto = /continue onto (.+)/i;
+      if (contOnto.test(t)) {
+        const m = t.match(contOnto);
+        return `${m[1]}-இல் தொடர்ந்து செல்லுங்கள்`;
+      }
+
+      Object.keys(tamilNav).forEach(key => {
+        const regex = new RegExp('\\b' + key + '\\b', 'gi');
+        t = t.replace(regex, tamilNav[key]);
+      });
+
+      t = t.replace(/(\d+(\.\d+)?)\s*km/g, '$1 கி.மீ');
+      t = t.replace(/(\d+)\s*m/g, '$1 மீட்டர்');
+
+      return t;
     }
 
-    // ---------------- Nearest Station Routing ----------------
-    document.getElementById("nearestBtn").addEventListener("click", () => {
-      if (!userMarker) {
-        alert("Waiting for your location...");
+    function speak(text) {
+      if (!voiceEnabled) return;
+      const langSelector = document.getElementById('voiceLang');
+      const lang = langSelector ? langSelector.value : 'en-US';
+
+      window.speechSynthesis.cancel();
+
+      let speechText = text;
+      if (lang === 'ta-IN') {
+        speechText = translateToTamil(text);
+      }
+
+      const utterance = new SpeechSynthesisUtterance(speechText);
+      utterance.lang = lang;
+
+      const voices = window.speechSynthesis.getVoices();
+      const tamilVoice = voices.find(v => v.lang.includes('ta') || v.name.toLowerCase().includes('tamil'));
+
+      if (tamilVoice) {
+        utterance.voice = tamilVoice;
+      }
+
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // 2. Initialize Map
+    function initMap() {
+      if (!userRole) {
+        window.location.href = 'login.html';
         return;
       }
 
-      const userLoc = userMarker.getLatLng();
-      let nearest = null;
-      let minDist = Infinity;
+      const mapContainer = document.getElementById("map");
+      if (!mapContainer) return console.error("Map container not found");
 
-      stations.forEach(station => {
-        const dist = map.distance(userLoc, [station.lat, station.longitude]);
-        if (dist < minDist && station.status.toLowerCase().includes("available")) { // Only route to available? Or nearest regardless?
-          // Let's route to nearest regardless of status, or prefer available.
-          // User code was simple nearest. Let's stick to nearest.
-          minDist = dist;
-          nearest = station;
+      map = L.map("map", { zoomControl: false }).setView([13.0827, 80.2707], 12);
+      L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+      baseTiles = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "CNG Connect",
+        className: 'map-tiles'
+      }).addTo(map);
+
+      loadStations();
+      trackUser();
+      initUIIsolation();
+    }
+
+    function toggleNightMode() {
+      const body = document.body;
+      isNightMode = !isNightMode;
+      body.classList.toggle('night-mode');
+
+      const toggleBtn = document.getElementById('nightToggle');
+
+      if (isNightMode) {
+        map.removeLayer(baseTiles);
+        baseTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; CartoDB'
+        }).addTo(map);
+        toggleBtn.innerHTML = '☀️ Day';
+      } else {
+        map.removeLayer(baseTiles);
+        baseTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: 'OSM'
+        }).addTo(map);
+        toggleBtn.innerHTML = '🌙 Night';
+      }
+    }
+
+    // 3. Smart Routing State
+    function setFinalDestination(lat, lng, name, isStation = false) {
+      if (!userMarker) return alert("Waiting for your location...");
+
+      const start = userMarker.getLatLng();
+      const end = L.latLng(lat, lng);
+
+      const lang = document.getElementById('voiceLang').value;
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+
+      // Reset waypoints to Start -> End
+      waypoints = [
+        { latLng: start, name: labels.currentLoc },
+        { latLng: end, name: name }
+      ];
+
+      generateNav();
+      document.getElementById('sidePanel').style.transform = 'translateX(0)';
+      map.closePopup();
+    }
+
+    function addWaypoint(lat, lng, name) {
+      const newWp = { latLng: L.latLng(lat, lng), name: name };
+      // Insert before the last element (destination)
+      waypoints.splice(waypoints.length - 1, 0, newWp);
+      generateNav();
+    }
+
+    // 4. Navigation Engine (Smart Route Analysis)
+    // 4. Navigation Engine (Smart Route Analysis)
+    let stepBubble = null;
+    let lastInstructions = null;
+    let lastCoords = null;
+
+    function generateNav() {
+      if (routingControl) map.removeControl(routingControl);
+
+      routingControl = L.Routing.control({
+        waypoints: waypoints.map(w => w.latLng),
+        lineOptions: {
+          styles: [{ color: '#f43f5e', weight: 7, opacity: 0.9 }] // Premium Red Path
+        },
+        createMarker: (i, wp) => {
+          if (i === 0) return null;
+
+          const iconUrl = i === waypoints.length - 1 ?
+            "http://maps.google.com/mapfiles/ms/icons/red-dot.png" :
+            "http://maps.google.com/mapfiles/ms/icons/green-dot.png";
+
+          return L.marker(wp.latLng, {
+            icon: L.icon({ iconUrl: iconUrl, iconSize: [32, 32], iconAnchor: [16, 32] })
+          }).bindPopup(`<b>${waypoints[i].name}</b>`);
+        },
+        routeWhileDragging: false,
+        addWaypoints: false,
+        showAlternatives: false
+      }).on('routesfound', function (e) {
+        const route = e.routes[0];
+        const routeCoords = route.coordinates;
+        const instructions = route.instructions;
+
+        lastInstructions = instructions;
+        lastCoords = routeCoords;
+
+        // ... (remaining routefound logic remains same)
+        let waitTime = 0;
+        const lastWaypoint = waypoints[waypoints.length - 1];
+        const targetStation = stations.find(s => s.lat === lastWaypoint.latLng.lat && s.lng === lastWaypoint.latLng.lng);
+        if (targetStation) {
+          const stat = targetStation.status.toLowerCase();
+          if (stat.includes('queue')) waitTime = 25;
+          else if (stat.includes('oper') || stat.includes('avail')) waitTime = 5;
+        }
+
+        const driveTime = Math.round(route.summary.totalTime / 60);
+        const totalTime = driveTime + waitTime;
+
+        const lang = document.getElementById('voiceLang').value;
+        const labels = uiLabels[lang] || uiLabels['en-US'];
+
+        document.getElementById('routeStats').style.display = 'block';
+        document.getElementById('distVal').innerText = (route.summary.totalDistance / 1000).toFixed(1) + ' ' + labels.km;
+        document.getElementById('timeVal').innerHTML = `<span title="${labels.min}">${totalTime} ${labels.min}</span>`;
+
+        const stationsAlongRoute = findStationsNearPath(routeCoords, 2.5);
+        updateJourneyLegend(waypoints, stationsAlongRoute);
+        updateDirections(instructions, routeCoords);
+      }).addTo(map);
+    }
+
+    function showDirectionBubble(lat, lng, text) {
+      if (stepBubble) map.removeLayer(stepBubble);
+
+      const isTamil = document.getElementById('voiceLang').value === 'ta-IN';
+      const displayText = isTamil ? translateToTamil(text) : text;
+
+      stepBubble = L.popup({
+        closeButton: false,
+        className: 'direction-bubble',
+        offset: [0, -10]
+      })
+        .setLatLng([lat, lng])
+        .setContent(`<div style="padding: 5px 10px; font-weight: 600; font-size: 12px; color: var(--dark);">${displayText}</div>`)
+        .openOn(map);
+    }
+
+    function updateDirections(instructions, coords) {
+      const list = document.getElementById('directionsList');
+      let html = '';
+
+      const lang = document.getElementById('voiceLang').value;
+      const isTamil = lang === 'ta-IN';
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+
+      instructions.forEach((step, idx) => {
+        let icon = '⏺️';
+        const rawText = step.text;
+        const text = rawText.toLowerCase();
+        if (text.includes('left')) icon = '⬅️';
+        else if (text.includes('right')) icon = '➡️';
+        else if (text.includes('straight')) icon = '⬆️';
+        else if (text.includes('arrival') || text.includes('destination')) icon = '🏁';
+        else if (text.includes('roundabout')) icon = '🔄';
+
+        const stepCoord = coords[step.index];
+        const displayStepText = isTamil ? translateToTamil(rawText) : rawText;
+        const distText = (step.distance / 1000).toFixed(1) + ' ' + labels.km;
+
+        html += `
+          <div class="direction-step" 
+               onclick="map.flyTo([${stepCoord.lat}, ${stepCoord.lng}], 17); showDirectionBubble(${stepCoord.lat}, ${stepCoord.lng}, '${rawText.replace(/'/g, "\\'")}'); speak('${rawText.replace(/'/g, "\\'")}')">
+            <div class="step-icon">${icon}</div>
+            <div class="step-text" style="flex:1">${displayStepText}</div>
+            <div class="step-dist" style="color:#94a3b8; font-size:11px">${distText}</div>
+          </div>
+        `;
+      });
+
+      list.innerHTML = html;
+    }
+
+    // Radius Search Logic
+    function findStationsNearPath(path, radiusKm) {
+      const suggested = [];
+      stations.forEach(s => {
+        // Skip if already a waypoint
+        if (waypoints.some(wp => wp.latLng.lat === s.lat && wp.latLng.lng === s.lng)) return;
+
+        const sLoc = L.latLng(s.lat, s.lng);
+        let minDistance = Infinity;
+
+        for (let i = 0; i < path.length; i += 5) {
+          const dist = sLoc.distanceTo(path[i]) / 1000;
+          if (dist < minDistance) minDistance = dist;
+          if (dist < radiusKm) break;
+        }
+
+        if (minDistance <= radiusKm) {
+          suggested.push({ ...s, distFromRoute: minDistance });
+        }
+      });
+      return suggested;
+    }
+
+    // Update the Sidebar with Journey Legend
+    function updateJourneyLegend(wps, nearbyStations) {
+      const lang = document.getElementById('voiceLang').value;
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+      const list = document.getElementById('waypointList');
+      let html = `<div class="journey-timeline">`;
+
+      wps.forEach((wp, idx) => {
+        const isStart = idx === 0;
+        const isEnd = idx === wps.length - 1;
+        const typeClass = isStart ? 'origin' : isEnd ? 'destination' : '';
+        const info = isStart ? labels.origin : isEnd ? labels.destination : labels.plannedStop;
+        const displayName = lang === 'ta-IN' ? translateToTamil(wp.name) : wp.name;
+
+        html += `
+          <div class="timeline-item ${typeClass}">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">${displayName}</div>
+              <div class="timeline-info">${info}</div>
+            </div>
+          </div>
+        `;
+
+        if (isStart && nearbyStations.length > 0) {
+          const availCount = nearbyStations.filter(s => s.status.toLowerCase().includes('oper') || s.status.toLowerCase().includes('avail')).length;
+          html += `
+            <div style="background: #eff6ff; border-radius: 8px; padding: 10px; margin: 10px 0;">
+              <p style="font-size: 11px; color: #1e40af; font-weight: 800; margin: 0; text-transform: uppercase;">
+                ⛽ ${availCount} ${labels.stationsFound}
+              </p>
+            </div>
+          `;
+          nearbyStations.forEach(s => {
+            const statusClass = s.status.includes('avail') ? 'status-available' :
+              s.status.includes('queue') ? 'status-queue' : 'status-closed';
+            html += `
+              <div class="timeline-item" style="opacity: 0.85">
+                <div class="timeline-marker" style="border-style: dashed;"></div>
+                <div class="timeline-content" style="background: #f8fafc; border-left: 3px solid var(--primary);">
+                  <div class="timeline-title" style="display:flex; justify-content:space-between; align-items:center;">
+                    ${s.name}
+                    <button onclick="addWaypoint(${s.lat}, ${s.lng}, '${s.name.replace(/'/g, "\\'")}')" 
+                            style="background: var(--primary); color: white; border: none; padding: 2px 6px; border-radius: 4px; font-size: 9px; cursor:pointer;">
+                      ${labels.add}
+                    </button>
+                  </div>
+                  <div class="timeline-info">
+                    <span>~${s.distFromRoute.toFixed(1)} ${labels.km}</span>
+                    <span class="status-pill ${statusClass}">${lang === 'ta-IN' ? translateToTamil(s.status) : s.status}</span>
+                  </div>
+                  <div style="font-size: 9px; margin-top: 5px; color: var(--secondary); cursor: pointer;" onclick="map.flyTo([${s.lat}, ${s.lng}], 16)">${labels.viewOnMap}</div>
+                </div>
+              </div>
+            `;
+          });
         }
       });
 
-      // If no station found?
-      if (!nearest && stations.length > 0) nearest = stations[0];
+      html += `</div>`;
+      list.innerHTML = html;
+    }
 
-      if (nearest) {
-        if (routingControl) {
-          map.removeControl(routingControl);
+    // 5. High-Performance Search (Restored Original Simplified Model)
+    async function performSearch() {
+      const input = document.getElementById('searchInput');
+      const searchBtn = document.getElementById('searchBtn');
+      let q = input.value.trim();
+      if (!q) return;
+
+      input.disabled = true;
+      const originalBtnHtml = searchBtn.innerHTML;
+      searchBtn.innerHTML = '<span class="loading-spinner">⌛</span>';
+
+      let query = q;
+      if (!query.toLowerCase().includes('tamil nadu')) {
+        query += ", Tamil Nadu";
+      }
+
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
+        if (!response.ok) throw new Error("Service unavailable");
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+          const res = data[0];
+          const lat = parseFloat(res.lat);
+          const lon = parseFloat(res.lon);
+          const center = L.latLng(lat, lon);
+          map.flyTo(center, 15);
+
+          const lang = document.getElementById('voiceLang').value;
+          const labels = uiLabels[lang] || uiLabels['en-US'];
+
+          L.popup({ className: 'custom-popup', maxWidth: 280 })
+            .setLatLng(center)
+            .setContent(`
+              <div class="popup-body" style="padding: 10px;">
+                <h3 style="margin: 0 0 10px 0; font-size: 15px; font-weight: 700;">${res.display_name.split(',')[0]}</h3>
+                <div style="font-size: 11px; color:#64748b; margin-bottom: 12px;">${res.display_name}</div>
+                <button class="action-btn btn-primary" onclick="setFinalDestination(${lat}, ${lon}, '${res.display_name.split(',')[0].replace(/'/g, "\\'")}')">
+                  ${labels.goHere}
+                </button>
+              </div>
+            `).openOn(map);
+        } else {
+          alert("Location not found.");
         }
-        routingControl = L.Routing.control({
-          waypoints: [
-            L.latLng(userLoc.lat, userLoc.lng),
-            L.latLng(nearest.lat, nearest.longitude)
-          ],
-          routeWhileDragging: false,
-          show: true, // Show directions
-          addWaypoints: false,
-          draggableWaypoints: false,
-          createMarker: function () { return null; }
+      } catch (err) {
+        alert("Search error. Try again.");
+      } finally {
+        input.disabled = false;
+        searchBtn.innerHTML = originalBtnHtml;
+      }
+    }
+
+    async function getCoordinates(q) {
+      let query = q;
+      if (!query.toLowerCase().includes('tamil nadu')) query += ", Tamil Nadu";
+      const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
+      const data = await resp.json();
+      if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+      throw new Error(`Location not found: ${q}`);
+    }
+
+    // 6. Station Logistics
+    function loadStations() {
+      fetch('/stations/get')
+        .then(r => r.json())
+        .then(data => {
+          stations = data.map(s => ({
+            id: s.id, name: s.name, status: (s.status || '').toLowerCase(),
+            lat: s.location.lat, lng: s.location.lng,
+            fuelType: s.fuelType || 'CNG',
+            evPower: s.evPowerKW,
+            connectors: s.connectorTypes,
+            operator: s.operator,
+            verified: s.verified,
+            lastRole: s.lastUpdatedByRole
+          }));
+          renderStationMarkers();
+        });
+    }
+
+    function renderStationMarkers() {
+      map.eachLayer(function (layer) {
+        if (layer instanceof L.Marker && layer !== userMarker) {
+          map.removeLayer(layer);
+        }
+      });
+
+      stations.forEach(s => {
+        let color = "red";
+        const stat = s.status.toLowerCase();
+        const lang = document.getElementById('voiceLang').value;
+        const labels = uiLabels[lang] || uiLabels['en-US'];
+
+        // Status Logic
+        if (stat.includes("available") || stat.includes("operational")) color = "green";
+        else if (stat.includes("queue")) color = "orange";
+        else if (stat.includes("service") || stat.includes("empty") || stat.includes("out")) color = "red";
+
+        // Multi-Fuel Icon Logic
+        let iconUrl = `http://maps.google.com/mapfiles/ms/icons/${color}-dot.png`;
+        if (s.fuelType === 'EV_CHARGER') {
+          iconUrl = `http://maps.google.com/mapfiles/ms/icons/yellow-dot.png`;
+        }
+
+        const m = L.marker([s.lat, s.lng], {
+          icon: L.icon({ iconUrl: iconUrl, iconSize: [32, 32], iconAnchor: [16, 32] })
         }).addTo(map);
 
-        alert(`Routing to ${nearest.name}`);
+        const translatedStatus = lang === 'ta-IN' ? translateToTamil(s.status) : s.status;
+        const translatedFuel = s.fuelType === 'EV_CHARGER' ?
+          (lang === 'ta-IN' ? '⚡ EV மின்னூட்டு நிலையம்' : '⚡ EV Fast Charger') :
+          (lang === 'ta-IN' ? '⛽ CNG நிலையம்' : '⛽ CNG Station');
 
-        // Start monitoring this station
-        currentDestinationId = nearest.id;
-        lastAlertedStatus = null; // Reset alert state
+        let content = `
+          <div class="popup-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-size: 10px; color: var(--primary); font-weight: 700; text-transform: uppercase;">
+                ${translatedFuel}
+              </span>
+              <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.1);">
+                  ${translatedStatus.toUpperCase()}
+                </span>
+                <span style="font-size: 8px; color: ${s.verified ? '#22c55e' : '#94a3b8'};">
+                  ${s.verified ? '✅ ' + labels.official : '👥 ' + labels.community}
+                </span>
+              </div>
+            </div>
+            <h3 style="margin-bottom: 12px;">${s.name}</h3>
+        `;
+
+        // Action Button (Navigate)
+        const btnText = s.fuelType === 'EV_CHARGER' ? labels.evNavigate : labels.navigate;
+        content += `
+            <button class="action-btn btn-primary" style="margin-bottom: 12px; height: 45px;"
+                    onclick="setFinalDestination(${s.lat}, ${s.lng}, '${s.name.replace(/'/g, "\\'")}', true)">
+              ${btnText}
+            </button>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 5px;">
+              <p style="font-size: 10px; color: #94a3b8; font-weight: 700; margin-bottom: 8px;">${labels.reportStatus}</p>
+              <div style="display: flex; gap: 4px;">
+                <button title="No Queue" class="action-btn btn-outline" style="font-size: 9px; padding: 4px; border-color: #22c55e; color: #22c55e;" onclick="updateStationStatus('${s.id}', 'Available', 5)">🟢 ${labels.noQ}</button>
+                <button title="30m wait" class="action-btn btn-outline" style="font-size: 9px; padding: 4px; border-color: #f59e0b; color: #f59e0b;" onclick="updateStationStatus('${s.id}', 'Queue (30m)', 30)">🟡 30m</button>
+                <button title="Out of Stock" class="action-btn btn-outline" style="font-size: 9px; padding: 4px; border-color: #ef4444; color: #ef4444;" onclick="updateStationStatus('${s.id}', 'Out of Stock', 0)">🚫 ${labels.mt}</button>
+              </div>
+              <p style="font-size: 9px; color: #64748b; margin-top: 5px; text-align: center;">
+                ${labels.lastVerified}: ${s.lastUpdated ? timeAgo(s.lastUpdated) : labels.justNow}
+              </p>
+            </div>
+        `;
+
+        if (userRole === 'ADMIN') {
+          content += `
+            <div class="admin-controls" style="margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px;">
+              <div style="display: flex; gap: 5px;">
+                <button class="action-btn btn-outline" style="font-size: 10px; flex: 1; border-color: #22c55e; color: #22c55e;" onclick="updateStationStatus('${s.id}', '${s.status}', ${s.queueTime}, true)">✅ ${labels.verifyBtn}</button>
+                <button class="action-btn btn-outline" style="font-size: 10px; flex: 1; border-color: #64748b;" onclick="updateStationStatus('${s.id}', 'Available', 5, true)">${labels.resetAva}</button>
+              </div>
+            </div>
+          `;
+        }
+        m.bindPopup(content + '</div>', { className: 'custom-popup' });
+      });
+    }
+
+    function timeAgo(date) {
+      const lang = document.getElementById('voiceLang').value;
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+      if (!date) return labels.justNow;
+
+      const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+      let interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + " " + labels.hAgo;
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + " " + labels.mAgo;
+      return Math.floor(seconds) + " " + labels.sAgo;
+    }
+
+    function updateStationStatus(id, stat, waitTime, forceVerify = false) {
+      const s = stations.find(x => x.id === id);
+      if (!s) return;
+
+      const updatedData = {
+        ...s,
+        location: { lat: s.lat, lng: s.lng },
+        status: stat,
+        waitTime: waitTime,
+        lastUpdated: new Date(),
+        verified: (userRole === 'ADMIN' || forceVerify),
+        lastUpdatedByRole: userRole
+      };
+
+      fetch(`/stations/${id}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      }).then(() => {
+        const lang = document.getElementById('voiceLang').value;
+        const labels = uiLabels[lang] || uiLabels['en-US'];
+        loadStations();
+        speak(stat === 'Out of Stock' ? labels.outOfStockAlert : labels.statusUpdated + ": " + (lang === 'ta-IN' ? translateToTamil(stat) : stat));
+      });
+    }
+
+    // 7. Utilities & Events
+    function trackUser() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.watchPosition(p => {
+        const loc = [p.coords.latitude, p.coords.longitude];
+        if (!userMarker) {
+          userMarker = L.marker(loc, { icon: L.icon({ iconUrl: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png", iconSize: [32, 32] }) }).addTo(map);
+          map.setView(loc, 13);
+        } else {
+          userMarker.setLatLng(loc);
+        }
+      }, null, { enableHighAccuracy: true });
+    }
+
+    document.getElementById('searchBtn').onclick = performSearch;
+    document.getElementById('searchInput').onkeypress = (e) => {
+      if (e.key === 'Enter') performSearch();
+    };
+
+    function initUIIsolation() {
+      // Prevent clicks from bubbles through UI to Map
+      const uiContainers = ['.header-controls', '.side-panel', '.map-overlay'];
+      uiContainers.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (el) {
+          L.DomEvent.disableClickPropagation(el);
+          L.DomEvent.disableScrollPropagation(el);
+        }
+      });
+    }
+
+    // Tab Switching Logic
+    document.getElementById('tabStops').onclick = function () {
+      this.classList.add('active');
+      document.getElementById('tabDirections').classList.remove('active');
+      document.getElementById('waypointList').classList.add('active');
+      document.getElementById('directionsList').classList.remove('active');
+    };
+
+    document.getElementById('tabDirections').onclick = function () {
+      this.classList.add('active');
+      document.getElementById('tabStops').classList.remove('active');
+      document.getElementById('directionsList').classList.add('active');
+      document.getElementById('waypointList').classList.remove('active');
+    };
+
+    document.getElementById('clearBtn').onclick = () => {
+      const isTamil = document.getElementById('voiceLang').value === 'ta-IN';
+      const labels = uiLabels[isTamil ? 'ta-IN' : 'en-US'];
+
+      setTimeout(() => document.getElementById('searchInput').focus(), 1500);
+      waypoints = [];
+      document.getElementById('waypointList').innerHTML = `<p style="text-align:center; color: #94a3b8; padding: 20px;">${labels.noJourney}</p>`;
+      document.getElementById('searchInput').value = '';
+      document.getElementById('directionsList').innerHTML = `<p style="text-align:center; color: #94a3b8; padding: 20px;">${labels.noDirections}</p>`;
+      if (routingControl) map.removeControl(routingControl);
+      document.getElementById('routeStats').style.display = 'none';
+      renderStationMarkers();
+    };
+
+    document.getElementById('togglePanel').onclick = function () {
+      const p = document.getElementById('sidePanel');
+      if (p.style.transform === 'translateX(350px)') {
+        p.style.transform = 'translateX(0)';
+        this.innerText = '⌵';
+      } else {
+        p.style.transform = 'translateX(350px)';
+        this.innerText = '🗺️';
+      }
+    };
+    function triggerSOS() {
+      if (!userMarker) return alert("Waiting for GPS...");
+
+      let nearest = null;
+      let minDistance = Infinity;
+
+      const lang = document.getElementById('voiceLang').value;
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+
+      stations.forEach(s => {
+        const stat = s.status.toLowerCase();
+        // Only target confirmed Available/Operational stations
+        if (stat.includes('avail') || stat.includes('oper')) {
+          const d = map.distance(userMarker.getLatLng(), [s.lat, s.lng]);
+          if (d < minDistance) {
+            minDistance = d;
+            nearest = s;
+          }
+        }
+      });
+
+      if (nearest) {
+        alert(`${labels.sosTarget}: ${nearest.name}`);
+        setFinalDestination(nearest.lat, nearest.lng, nearest.name, true);
+      } else {
+        alert(labels.sosFail);
+      }
+    }
+
+    document.getElementById('nearestBtn').onclick = triggerSOS;
+    document.getElementById('sosBtn').onclick = triggerSOS;
+
+    document.getElementById('voiceToggle').onclick = function () {
+      voiceEnabled = !voiceEnabled;
+      const isTamil = document.getElementById('voiceLang').value === 'ta-IN';
+
+      if (isTamil) {
+        this.innerHTML = voiceEnabled ? '🔊 குரல் இயக்கு' : '🔇 குரல் நிறுத்து';
+        speak(voiceEnabled ? "voice navigation enabled" : "voice navigation disabled");
+      } else {
+        this.innerHTML = voiceEnabled ? '🔊 Voice On' : '🔇 Voice Off';
+        speak(voiceEnabled ? "Voice navigation enabled" : "Voice navigation disabled");
+      }
+      this.style.background = voiceEnabled ? 'var(--primary)' : '#94a3b8';
+    };
+
+    document.getElementById('voiceLang').onchange = function () {
+      const lang = this.value;
+      const labels = uiLabels[lang] || uiLabels['en-US'];
+
+      // Localize UI Labels with Precise Tamil
+      document.getElementById('panelTitle').innerText = labels.panelTitle;
+      document.getElementById('tabStops').innerText = labels.tabStops;
+      document.getElementById('tabDirections').innerText = labels.tabDirections;
+      document.getElementById('clearBtn').innerText = labels.clearBtn;
+      document.getElementById('generateBtn').innerText = labels.generateBtn;
+      document.getElementById('searchBtn').innerText = labels.searchBtn;
+      document.getElementById('nearestBtn').innerText = labels.nearestBtn;
+      document.getElementById('searchInput').placeholder = labels.searchInput;
+      document.getElementById('voiceToggle').innerHTML = voiceEnabled ? labels.voiceOn : labels.voiceOff;
+
+      // Re-trigger rendering to flip language of existing elements
+      renderStationMarkers();
+      if (lastInstructions && lastCoords) {
+        updateDirections(lastInstructions, lastCoords);
+      }
+      updateJourneyLegend(waypoints, []);
+    };
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initMap();
+      setInterval(loadStations, 30000);
+
+      // Check for trip from planner
+      const pending = localStorage.getItem('pendingTrip');
+      if (pending) {
+        localStorage.removeItem('pendingTrip');
+        const { start, end } = JSON.parse(pending);
+
+        const lang = document.getElementById('voiceLang').value;
+        const labels = uiLabels['ta-IN']; // Geocoding is usually during load, we default to the lang selector's current value
+
+        try {
+          // Show loading message on map
+          const loadingMsg = L.popup()
+            .setLatLng([13.0827, 80.2707])
+            .setContent(`<div style="padding:10px; font-weight:700;">${labels.loadingGeo}</div>`)
+            .openOn(map);
+
+          let startLatLng;
+          if (start === 'My Current Location') {
+            // Wait for GPS if possible, else use default search
+            if (userMarker) {
+              startLatLng = userMarker.getLatLng();
+            } else {
+              startLatLng = await getCoordinates(start);
+            }
+          } else {
+            startLatLng = await getCoordinates(start);
+          }
+
+          const endLatLng = await getCoordinates(end);
+
+          waypoints = [
+            { latLng: L.latLng(startLatLng.lat, startLatLng.lng), name: start },
+            { latLng: L.latLng(endLatLng.lat, endLatLng.lng), name: end }
+          ];
+
+          map.closePopup();
+          generateNav();
+          document.getElementById('sidePanel').style.transform = 'translateX(0)';
+          map.fitBounds(L.latLngBounds(startLatLng, endLatLng), { padding: [50, 50] });
+
+        } catch (err) {
+          console.error("Geocoding failed", err);
+          alert("Could not find one of the locations. Please try a more specific address.");
+        }
       }
     });
-
-    // ---------------- Load Stations on Page Load ----------------
-    loadStations();
-    setInterval(loadStations, 30000); // Poll every 30s
   </script>
 </body>
 

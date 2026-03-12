@@ -3,35 +3,471 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CNG Connect - Smart Station Finder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <nav class="navbar">
         <a href="index.html" class="logo">CNG Connect</a>
-        <div class="nav-links">
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="how-it-works.html" class="nav-link">About</a>
+        
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <select id="langSwitch" onchange="changeLanguage()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; outline: none; backdrop-filter: blur(10px);">
+                <option value="en-US">English</option>
+                <option value="ta-IN">தமிழ்</option>
+            </select>
+
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" id="nav-home">Home</a>
+                <a href="#features" class="nav-link" id="nav-features">Features</a>
+                <a href="#fleet" class="nav-link" id="nav-fleet">Fleet</a>
+                <a href="how-it-works.html" class="nav-link" id="nav-about">About</a>
+                <a href="plan-trip.html" class="nav-link" id="nav-plan">Plan Trip</a>
+                
+                <a href="login.html" class="btn btn-primary" id="btn-login"
+                    style="padding: 0.5rem 1.5rem; border-radius: 12px; font-size: 0.9rem;">Sign In</a>
+            </div>
         </div>
     </nav>
 
-    <div class="container">
-        <div class="hero-content">
-            <h1>Smart Navigation <br>for <span>CNG Drivers</span></h1>
-            <p class="subtitle">
-                Find the nearest operational CNG stations in real-time.
-                Optimized routing, live status updates, and distance estimation
-                to keep you moving without delays.
-            </p>
+    <main>
+        <!-- Hero Section -->
+        <section class="container hero" style="min-height: 85vh;">
+            <div class="hero-content">
+                <div class="badge" id="hero-badge">🚀 LIVE IN CHENNAI & COIMBATORE</div>
+                <h1 id="hero-title">Solving the <span>Fuel Crisis</span>. One Station at a Time.</h1>
+                <p class="subtitle" id="hero-subtitle">
+                    The only real-time ecosystem designed specifically for the Indian CNG community. 
+                    Eliminate 2-hour queues with our "Live Pulse" technology, built for drivers, by drivers.
+                </p>
+                <div class="btn-group">
+                    <a href="login.html" class="btn btn-primary" id="btn-launch">Launch Live Map</a>
+                    <a href="plan-trip.html" class="btn btn-secondary" id="btn-plan-hero">Plan Your Trip</a>
+                </div>
+            </div>
+            <div class="scroll-down" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">↓
+            </div>
+        </section>
+
+        <!-- Live Showcase Mock -->
+        <section class="container" style="padding: 0 0 100px;">
+            <div style="background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px; padding: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; width: 100%; max-width: 1100px;">
+                <div class="mockup-card" style="border: 1px solid #22c55e66; animation: fadeIn 0.5s ease-out;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem; color: #4ade80;" id="station-io">IO Petrol - T.Nagar</span>
+                        <span class="badge" style="margin: 0; padding: 2px 8px; font-size: 10px; background: #22c55e33; color: #4ade80;" id="status-available">Available</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">🚥</i> <span class="wait-label">Wait:</span> 15m</span>
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">⏱️</i> <span class="dist-label">Dist:</span> 2.1km</span>
+                    </div>
+                    <p style="font-size: 10px; color: #64748b;" id="report-label">Reported by Auto Ramesh - 3m ago</p>
+                </div>
+                <div class="mockup-card" style="border: 1px solid #f43f5e66; animation: fadeIn 0.5s ease-out 0.2s; background: rgba(244, 63, 94, 0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem; color: #fb7185;" id="station-hp">HP - Anna Nagar</span>
+                        <span class="badge" style="margin: 0; padding: 2px 8px; font-size: 10px; background: #f43f5e33; color: #fb7185;" id="status-no-q">Out of Stock</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">🚥</i> <span class="wait-label">Wait:</span> 0m</span>
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">⏱️</i> <span class="dist-label">Dist:</span> 4.5km</span>
+                    </div>
+                    <p style="font-size: 10px; color: #64748b;" id="report-label-2">Reported by Driver Kumar - 10m ago</p>
+                </div>
+                <div class="mockup-card" style="border: 1px solid #3b82f666; animation: fadeIn 0.5s ease-out 0.4s;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <span style="font-weight: 700; font-size: 1.1rem; color: #60a5fa;" id="station-bp">BP - Guindy</span>
+                        <span class="badge" style="margin: 0; padding: 2px 8px; font-size: 10px; background: #3b82f633; color: #60a5fa;" id="status-heavy">Heavy Queue</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">🚥</i> <span class="wait-label">Wait:</span> 45m</span>
+                        <span style="font-size: 12px; color: #94a3b8;"><i class="feature-icon" style="font-size: 12px; margin: 0;">⏱️</i> <span class="dist-label">Dist:</span> 0.5km</span>
+                    </div>
+                    <p style="font-size: 10px; color: #64748b;" id="report-label-3">Reported by S. Mani - 1h ago</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-num" id="stat-num-hubs">35+</span>
+                <p id="stat-hubs">Verified Hubs</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="stat-num-queue">0s</span>
+                <p id="stat-queue">Queue Blindness</p>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num" id="stat-num-time">2hr</span>
+                <p id="stat-time">Daily Time Saved</p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="container features-section">
+            <div class="section-title">
+                <h2 id="features-title">The <span>TTR</span> Edge</h2>
+                <p id="features-subtitle">We solve the real problems that other mapping apps ignore.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🚥</div>
+                    <h3 id="feature-live-title">Live Status Reporting</h3>
+                    <p id="feature-live-desc">Drivers on the ground update queue lengths and "Out of Stock" alerts in real-time. No more
+                        surprises at the pump.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3 id="feature-ttr-title">Total Time to Refill</h3>
+                    <p id="feature-ttr-desc">Our unique "TTR" algorithm combines [Live Traffic + Reported Queue Wait] to give you the honest
+                        time you'll be back on road.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 id="feature-verify-title">Verify Before You Drive</h3>
+                    <p id="feature-verify-desc">Check "Last Updated" timestamps for every station. Built for transparency to help you maximize
+                        daily earning hours.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="container" style="padding: 100px 20px;">
+            <div class="section-title">
+                <h2 id="how-it-works-title">How it <span>Works</span></h2>
+                <p id="how-it-works-subtitle">A simple guide for drivers to get the most out of CNG Connect.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">1️⃣</div>
+                    <h3 id="step-1-title">Find a Station</h3>
+                    <p id="step-1-desc">Use the live map to locate nearby CNG stations and view their real-time status.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">2️⃣</div>
+                    <h3 id="step-2-title">Check TTR</h3>
+                    <p id="step-2-desc">See the estimated Total Time to Refill (TTR) to avoid long queues.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">3️⃣</div>
+                    <h3 id="step-3-title">Report Status</h3>
+                    <p id="step-3-desc">Help others by reporting the current queue status or if a station is out of stock.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">4️⃣</div>
+                    <h3 id="step-4-title">Plan Trip</h3>
+                    <p id="step-4-desc">Plan journeys with multiple CNG stops, checking their status in advance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- High Accuracy Trip Section -->
+        <section class="container" style="padding: 100px 20px; background: rgba(34, 197, 94, 0.05);">
+            <div class="section-title">
+                <h2 id="trip-header">Plan Smarter for <span>Long Hauls</span></h2>
+                <p id="trip-desc">Going to Bangalore or Puducherry? Check fuel status for 10+ stations along your route at once.</p>
+            </div>
             <div class="btn-group">
-                <a href="login.html" class="btn btn-primary">Open Live Map</a>
-                <a href="how-it-works.html" class="btn btn-secondary">How It Works</a>
+                 <a href="plan-trip.html" class="btn btn-primary" id="btn-start-plan">Start Planning</a>
+            </div>
+        </section>
+
+        <!-- Government & Fleet Section -->
+        <section id="fleet" class="container" style="padding: 100px 20px;">
+            <div class="fleet-cta">
+                <div class="fleet-content">
+                    <div class="badge" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;" id="badge-pitch">🏛️ PITCH READY</div>
+                    <h2 id="fleet-title">Government & <span>Fleet Solutions</span></h2>
+                    <p id="fleet-desc">Our platform provides actionable insights for regional transport authorities and logistics companies. Reduce city-wide congestion and optimize fuel supply trucks with our heatmap technology.</p>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <a href="#" class="btn btn-primary" id="btn-pilot">Request Pilot Access</a>
+                    </div>
+                </div>
+                <div class="fleet-mockup" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="mockup-card" style="grid-column: span 2; background: rgba(34, 197, 94, 0.1); border: 1px solid #22c55e44;">
+                         <div style="font-size: 0.8rem; opacity: 0.7;" id="label-city-index">City-Wide Congestion Index</div>
+                         <div style="font-size: 1.8rem; font-weight: 700; color: #22c55e;">14.2% <span style="font-size: 0.9rem; font-weight: 400; color: #94a3b8;">(-2.4% vs prev hr)</span></div>
+                    </div>
+                    <div class="mockup-card">
+                         <div style="font-size: 0.7rem; opacity: 0.7;" id="label-hotspots">Active Hotspots</div>
+                         <div style="height: 60px; display: flex; align-items: flex-end; gap: 4px; margin-top: 10px;">
+                             <div style="background: #22c55e; height: 30%; width: 15%; border-radius: 2px;"></div>
+                             <div style="background: #22c55e; height: 60%; width: 15%; border-radius: 2px;"></div>
+                             <div style="background: #ef4444; height: 90%; width: 15%; border-radius: 2px;"></div>
+                             <div style="background: #22c55e; height: 40%; width: 15%; border-radius: 2px;"></div>
+                             <div style="background: #22c55e; height: 70%; width: 15%; border-radius: 2px;"></div>
+                         </div>
+                    </div>
+                    <div class="mockup-card">
+                         <div style="font-size: 0.7rem; opacity: 0.7;" id="label-supply">Supply Efficiency</div>
+                         <div style="font-size: 1.2rem; font-weight: 600; margin-top: 10px;">98.4%</div>
+                         <div style="width: 100%; height: 4px; background: #334155; border-radius: 2px; margin-top: 5px;">
+                             <div style="width: 98%; height: 100%; background: #3b82f6; border-radius: 2px;"></div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">CNG Connect</a>
+                <p id="footer-bio">Built for the hard-working drivers of Chennai. Navigate smarter, refuel faster.</p>
+            </div>
+            <div class="footer-nav">
+                <h4 id="footer-platform">Platform</h4>
+                <a href="login.html" id="link-map">Live Map</a>
+                <a href="#features" id="link-feat">Features</a>
+                <a href="#fleet" id="link-fleet">Fleet Solutions</a>
+            </div>
+            <div class="footer-nav">
+                <h4 id="footer-support">Support</h4>
+                <a href="how-it-works.html" id="link-about">About Us</a>
+                <a href="#" id="link-help">Help Center</a>
+                <a href="#" id="link-contact">Contact Support</a>
+            </div>
+            <div class="footer-nav">
+                <h4 id="footer-legal">Legal</h4>
+                <a href="#" id="link-priv">Privacy Policy</a>
+                <a href="#" id="link-terms">Terms of Use</a>
             </div>
         </div>
-    </div>
+        <div class="footer-bottom">
+            &copy; 2026 CNG Connect. <span id="rights">All rights reserved.</span> 🇮🇳
+        </div>
+    </footer>
+
+    <script>
+        const uiLabels = {
+            'en-US': {
+                navHome: 'Home',
+                navFeatures: 'Features',
+                navFleet: 'Fleet',
+                navAbout: 'About',
+                navPlan: 'Plan Trip',
+                btnLogin: 'Sign In',
+                heroBadge: '🚀 LIVE IN CHENNAI & COIMBATORE',
+                heroTitle: 'Solving the <span>Fuel Crisis</span>. One Station at a Time.',
+                heroSubtitle: 'The only real-time ecosystem designed specifically for the Indian CNG community. Eliminate 2-hour queues with our "Live Pulse" technology, built for drivers, by drivers.',
+                btnLaunch: 'Launch Live Map',
+                btnPlanHero: 'Plan Your Trip',
+                statHubs: 'Verified Hubs',
+                statQueue: 'Queue Blindness',
+                statTime: 'Daily Time Saved',
+                stationIO: 'IO Petrol - T.Nagar',
+                stationHP: 'HP - Anna Nagar',
+                stationBP: 'BP - Guindy',
+                statusAvailable: 'Available',
+                statusNoQ: 'Out of Stock',
+                statusHeavy: 'Heavy Queue',
+                wait: 'Wait:',
+                dist: 'Dist:',
+                reportedByA: 'Reported by Auto Ramesh - 3m ago',
+                reportedByK: 'Reported by Driver Kumar - 10m ago',
+                reportedByS: 'Reported by S. Mani - 1h ago',
+                featuresTitle: 'The <span>TTR</span> Edge',
+                featuresSubtitle: 'We solve the real problems that other mapping apps ignore.',
+                featureLiveTitle: 'Live Status Reporting',
+                featureLiveDesc: 'Drivers on the ground update queue lengths and "Out of Stock" alerts in real-time. No more surprises at the pump.',
+                featureTTRTitle: 'Total Time to Refill',
+                featureTTRDesc: 'Our unique "TTR" algorithm combines [Live Traffic + Reported Queue Wait] to give you the honest time you\'ll be back on road.',
+                featureVerifyTitle: 'Verify Before You Drive',
+                featureVerifyDesc: 'Check "Last Updated" timestamps for every station. Built for transparency to help you maximize daily earning hours.',
+                howItWorksTitle: 'How it <span>Works</span>',
+                howItWorksSubtitle: 'A simple guide for drivers to get the most out of CNG Connect.',
+                step1Title: 'Find a Station',
+                step1Desc: 'Use the live map to locate nearby CNG stations and view their real-time status.',
+                step2Title: 'Check TTR',
+                step2Desc: 'See the estimated Total Time to Refill (TTR) to avoid long queues and save time.',
+                step3Title: 'Report Status',
+                step3Desc: 'Help other drivers by quickly reporting the current queue status or if a station is out of stock.',
+                step4Title: 'Plan Your Trip',
+                step4Desc: 'For long journeys, plan your route with multiple CNG stops, checking their status in advance.',
+                tripHeader: 'Plan Smarter for <span>Long Hauls</span>',
+                tripDesc: 'Going to Bangalore or Puducherry? Check fuel status for 10+ stations along your route at once.',
+                btnStartPlan: 'Start Planning',
+                badgePitch: '🏛️ PITCH READY',
+                fleetTitle: 'Government & <span>Fleet Solutions</span>',
+                fleetDesc: 'Our platform provides actionable insights for regional transport authorities and logistics companies. Reduce city-wide congestion and optimize fuel supply trucks with our heatmap technology.',
+                btnPilot: 'Request Pilot Access',
+                labelCityIndex: 'City-Wide Congestion Index',
+                labelHotspots: 'Active Hotspots',
+                labelSupply: 'Supply Efficiency',
+                footerBio: 'Built for the hard-working drivers of Chennai. Navigate smarter, refuel faster.',
+                footerPlatform: 'Platform',
+                linkMap: 'Live Map',
+                linkFeat: 'Features',
+                linkFleet: 'Fleet Solutions',
+                footerSupport: 'Support',
+                linkAbout: 'About Us',
+                linkHelp: 'Help Center',
+                linkContact: 'Contact Support',
+                footerLegal: 'Legal',
+                linkPriv: 'Privacy Policy',
+                linkTerms: 'Terms of Use',
+                rights: 'All rights reserved.'
+            },
+            'ta-IN': {
+                navHome: 'முகப்பு',
+                navFeatures: 'அம்சங்கள்',
+                navFleet: 'படை',
+                navAbout: 'எங்களை பற்றி',
+                navPlan: 'பயணத் திட்டம்',
+                btnLogin: 'உள்நுழைக',
+                heroBadge: '🚀 சென்னை மற்றும் கோவையில் நேரலையில் உள்ளது',
+                heroTitle: '<span>எரிபொருள் நெருக்கடி</span>க்கு தீர்வு. ஒவ்வொரு நிலையமாக.',
+                heroSubtitle: 'இந்திய CNG சமூகத்திற்காக பிரத்யேகமாக வடிவமைக்கப்பட்ட ஒரே தொழில்நுட்பம். 2 மணிநேர வரிசைகளை எங்கள் "லைவ் பல்ஸ்" தொழில்நுட்பம் மூலம் நீக்குங்கள், ஓட்டுநர்களுக்காக ஓட்டுநர்களால் உருவாக்கப்பட்டது.',
+                btnLaunch: 'வரைபடத்தைத் திறக்கவும்',
+                btnPlanHero: 'உங்கள் பயணத்தைத் திட்டமிடுங்கள்',
+                statHubs: 'சரிபார்க்கப்பட்ட மையங்கள்',
+                statQueue: 'வரிசை தெரியாமை',
+                statTime: 'தினசரி நேரம் சேமிக்கப்பட்டது',
+                stationIO: 'ஐஓ பெட்ரோல் - டி.நகர்',
+                stationHP: 'ஹெச்பி - அண்ணா நகர்',
+                stationBP: 'பிபி - கிண்டி',
+                statusAvailable: 'கிடைக்கிறது',
+                statusNoQ: 'இருப்பு இல்லை',
+                statusHeavy: 'நீண்ட வரிசை',
+                wait: 'காத்திருப்பு:',
+                dist: 'தூரம்:',
+                reportedByA: 'ஆட்டோ ரமேஷ் - 3 நிமிடங்களுக்கு முன் அறிவித்தார்',
+                reportedByK: 'டிரைவர் குமார் - 10 நிமிடங்களுக்கு முன் அறிவித்தார்',
+                reportedByS: 'எஸ். மணி - 1 மணி நேரத்திற்கு முன் அறிவித்தார்',
+                featuresTitle: '<span>TTR</span> சிறப்பு',
+                featuresSubtitle: 'மற்ற மேப்பிங் பயன்பாடுகள் புறக்கணிக்கும் உண்மையான சிக்கல்களை நாங்கள் தீர்க்கிறோம்.',
+                featureLiveTitle: 'நேரடி நிலை அறிக்கை',
+                featureLiveDesc: 'ஓட்டுநர்கள் வரிசை நீளங்கள் மற்றும் "இருப்பு இல்லை" எச்சரிக்கைகளை நிகழ்நேரத்தில் புதுப்பிக்கிறார்கள். பம்பில் இனி ஆச்சரியங்கள் இல்லை.',
+                featureTTRTitle: 'எரிபொருள் நிரப்ப மொத்த நேரம்',
+                featureTTRDesc: 'எங்கள் தனித்துவமான "TTR" அல்காரிதம் [நேரடி போக்குவரத்து + அறிவிக்கப்பட்ட வரிசை காத்திருப்பு] ஆகியவற்றை ஒருங்கிணைத்து நீங்கள் மீண்டும் சாலையில் இருக்கும் உண்மையான நேரத்தை வழங்குகிறது.',
+                featureVerifyTitle: 'ஓட்டுவதற்கு முன் சரிபார்க்கவும்',
+                featureVerifyDesc: 'ஒவ்வொரு நிலையத்திற்கும் "கடைசியாக புதுப்பிக்கப்பட்டது" நேர முத்திரைகளை சரிபார்க்கவும். உங்கள் தினசரி வருவாய் நேரத்தை அதிகரிக்க வெளிப்படைத்தன்மைக்காக கட்டப்பட்டது.',
+                howItWorksTitle: 'இது <span>எப்படி வேலை செய்கிறது</span>',
+                howItWorksSubtitle: 'CNG Connect ஐப் பயன்படுத்த ஓட்டுநர்களுக்கான எளிய வழிகாட்டி.',
+                step1Title: 'ஒரு நிலையத்தைக் கண்டறியவும்',
+                step1Desc: 'அருகிலுள்ள CNG நிலையங்களைக் கண்டறியவும் மற்றும் அவற்றின் நிகழ்நேர நிலையைப் பார்க்கவும் நேரடி வரைபடத்தைப் பயன்படுத்தவும்.',
+                step2Title: 'TTR ஐ சரிபார்க்கவும்',
+                step2Desc: 'நீண்ட வரிசைகளைத் தவிர்க்கவும் மற்றும் நேரத்தைச் சேமிக்கவும் எரிபொருள் நிரப்ப மதிப்பிடப்பட்ட மொத்த நேரத்தைப் (TTR) பார்க்கவும்.',
+                step3Title: 'நிலையை புகாரளிக்கவும்',
+                step3Desc: 'தற்போதைய வரிசை நிலை அல்லது ஒரு நிலையம் இருப்பு இல்லை என்றால் விரைவாகப் புகாரளிப்பதன் மூலம் மற்ற ஓட்டுநர்களுக்கு உதவுங்கள்.',
+                step4Title: 'உங்கள் பயணத்தைத் திட்டமிடுங்கள்',
+                step4Desc: 'நீண்ட பயணங்களுக்கு, உங்கள் வழியில் பல CNG நிறுத்தங்களுடன் உங்கள் பயணத்தைத் திட்டமிடுங்கள், அவற்றின் நிலையை முன்கூட்டியே சரிபார்க்கவும்.',
+                tripHeader: '<span>நீண்ட பயண</span>த் திட்டம்',
+                tripDesc: 'பெங்களூர் அல்லது புதுச்சேரி செல்கிறீர்களா? உங்கள் வழியில் உள்ள 10+ நிலையங்களைப் பார்க்கவும்.',
+                btnStartPlan: 'திட்டமிடத் தொடங்கு',
+                badgePitch: '🏛️ பிட்ச் தயார்',
+                fleetTitle: 'அரசாங்கம் மற்றும் <span>கார்ப்பரேட் தீர்வுகள்</span>',
+                fleetDesc: 'எங்கள் தளம் பிராந்திய போக்குவரத்து அதிகாரிகள் மற்றும் தளவாட நிறுவனங்களுக்கு செயல்படக்கூடிய நுண்ணறிவுகளை வழங்குகிறது. எங்கள் ஹீட்மேப் தொழில்நுட்பம் மூலம் நகர அளவிலான நெரிசலைக் குறைத்து எரிபொருள் விநியோக லாரிகளை மேம்படுத்துங்கள்.',
+                btnPilot: 'பைலட் அணுகலைக் கோரவும்',
+                labelCityIndex: 'நகரம் தழுவிய நெரிசல் குறியீடு',
+                labelHotspots: 'செயலில் உள்ள இடங்கள்',
+                labelSupply: 'விநியோக திறன்',
+                footerBio: 'சென்னையின் உழைக்கும் ஓட்டுநர்களுக்காக உருவாக்கப்பட்டது. புத்திசாலித்தனமாகச் சென்று, வேகமாக எரிபொருளை நிரப்பவும்.',
+                footerPlatform: 'தளம்',
+                linkMap: 'நேரடி வரைபடம்',
+                linkFeat: 'அம்சங்கள்',
+                linkFleet: 'படை தீர்வுகள்',
+                footerSupport: 'ஆதரவு',
+                linkAbout: 'எங்களை பற்றி',
+                linkHelp: 'உதவி மையம்',
+                linkContact: 'ஆதரவைத் தொடர்பு கொள்ளுங்கள்',
+                footerLegal: 'சட்ட',
+                linkPriv: 'தனியுரிமைக் கொள்கை',
+                linkTerms: 'பயன்பாட்டு விதிமுறைகள்',
+                rights: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.'
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSwitch').value;
+            localStorage.setItem('preferredLang', lang);
+            const labels = uiLabels[lang];
+
+            document.getElementById('nav-home').innerText = labels.navHome;
+            document.getElementById('nav-features').innerText = labels.navFeatures;
+            document.getElementById('nav-fleet').innerText = labels.navFleet;
+            document.getElementById('nav-about').innerText = labels.navAbout;
+            document.getElementById('nav-plan').innerText = labels.navPlan;
+            document.getElementById('btn-login').innerText = labels.btnLogin;
+            
+            document.getElementById('hero-badge').innerText = labels.heroBadge;
+            document.getElementById('hero-title').innerHTML = labels.heroTitle;
+            document.getElementById('hero-subtitle').innerText = labels.heroSubtitle;
+            document.getElementById('btn-launch').innerText = labels.btnLaunch;
+            document.getElementById('btn-plan-hero').innerText = labels.btnPlanHero;
+
+            document.getElementById('stat-hubs').innerText = labels.statHubs;
+            document.getElementById('stat-queue').innerText = labels.statQueue;
+            document.getElementById('stat-time').innerText = labels.statTime;
+
+            document.getElementById('station-io').innerText = labels.stationIO;
+            document.getElementById('station-hp').innerText = labels.stationHP;
+            document.getElementById('station-bp').innerText = labels.stationBP;
+            document.getElementById('status-available').innerText = labels.statusAvailable;
+            document.getElementById('status-no-q').innerText = labels.statusNoQ;
+            document.getElementById('status-heavy').innerText = labels.statusHeavy;
+            document.querySelectorAll('.wait-label').forEach(el => el.innerText = labels.wait);
+            document.querySelectorAll('.dist-label').forEach(el => el.innerText = labels.dist);
+            document.getElementById('report-label').innerText = labels.reportedByA;
+            document.getElementById('report-label-2').innerText = labels.reportedByK;
+            document.getElementById('report-label-3').innerText = labels.reportedByS;
+
+            document.getElementById('features-title').innerHTML = labels.featuresTitle;
+            document.getElementById('features-subtitle').innerText = labels.featuresSubtitle;
+            document.getElementById('feature-live-title').innerText = labels.featureLiveTitle;
+            document.getElementById('feature-live-desc').innerText = labels.featureLiveDesc;
+            document.getElementById('feature-ttr-title').innerText = labels.featureTTRTitle;
+            document.getElementById('feature-ttr-desc').innerText = labels.featureTTRDesc;
+            document.getElementById('feature-verify-title').innerText = labels.featureVerifyTitle;
+            document.getElementById('feature-verify-desc').innerText = labels.featureVerifyDesc;
+
+            document.getElementById('how-it-works-title').innerHTML = labels.howItWorksTitle;
+            document.getElementById('how-it-works-subtitle').innerText = labels.howItWorksSubtitle;
+            document.getElementById('step-1-title').innerText = labels.step1Title;
+            document.getElementById('step-1-desc').innerText = labels.step1Desc;
+            document.getElementById('step-2-title').innerText = labels.step2Title;
+            document.getElementById('step-2-desc').innerText = labels.step2Desc;
+            document.getElementById('step-3-title').innerText = labels.step3Title;
+            document.getElementById('step-3-desc').innerText = labels.step3Desc;
+            document.getElementById('step-4-title').innerText = labels.step4Title;
+            document.getElementById('step-4-desc').innerText = labels.step4Desc;
+
+            document.getElementById('trip-header').innerHTML = labels.tripHeader;
+            document.getElementById('trip-desc').innerText = labels.tripDesc;
+            document.getElementById('btn-start-plan').innerText = labels.btnStartPlan;
+
+            document.getElementById('badge-pitch').innerText = labels.badgePitch;
+            document.getElementById('fleet-title').innerHTML = labels.fleetTitle;
+            document.getElementById('fleet-desc').innerText = labels.fleetDesc;
+            document.getElementById('btn-pilot').innerText = labels.btnPilot;
+            document.getElementById('label-city-index').innerText = labels.labelCityIndex;
+            document.getElementById('label-hotspots').innerText = labels.labelHotspots;
+            document.getElementById('label-supply').innerText = labels.labelSupply;
+
+            document.getElementById('footer-bio').innerText = labels.footerBio;
+            document.getElementById('footer-platform').innerText = labels.footerPlatform;
+            document.getElementById('link-map').innerText = labels.linkMap;
+            document.getElementById('link-feat').innerText = labels.linkFeat;
+            document.getElementById('link-fleet').innerText = labels.linkFleet;
+            document.getElementById('footer-support').innerText = labels.footerSupport;
+            document.getElementById('link-about').innerText = labels.linkAbout;
+            document.getElementById('link-help').innerText = labels.linkHelp;
+            document.getElementById('link-contact').innerText = labels.linkContact;
+            document.getElementById('footer-legal').innerText = labels.footerLegal;
+            document.getElementById('link-priv').innerText = labels.linkPriv;
+            document.getElementById('link-terms').innerText = labels.linkTerms;
+            document.getElementById('rights').innerText = labels.rights;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLang') || 'en-US'; // Default to English if no preference
+            document.getElementById('langSwitch').value = savedLang;
+            changeLanguage();
+        });
+    </script>
 </body>
 
 </html>

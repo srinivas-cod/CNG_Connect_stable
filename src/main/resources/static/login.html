@@ -4,64 +4,716 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - CNG Connect</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Login | CNG Connect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: hsl(142, 71%, 45%);
+            --secondary: hsl(210, 100%, 50%);
+            --dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-dark: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background: #020617;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            color: white;
+        }
+
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.15), transparent 70%);
+            z-index: 0;
+        }
+
+        .login-container {
+            width: 90%;
+            max-width: 420px;
+            z-index: 10;
+            perspective: 1000px;
+        }
+
+        .login-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #4ade80, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+
+        .login-tabs {
+            display: flex;
+            background: var(--glass-dark);
+            padding: 5px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 12px;
+            transition: all 0.3s;
+            color: #94a3b8;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 5px 15px;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .input-wrapper input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 10px 5px;
+            width: 100%;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .phone-prefix {
+            color: #64748b;
+            font-weight: 600;
+            margin-right: 10px;
+            padding-right: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #otp-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .otp-inputs {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .otp-box {
+            width: 42px;
+            height: 48px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            outline: none;
+        }
+
+        .otp-box:focus {
+            border-color: var(--primary);
+        }
+
+        .footer-links {
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 20px;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Admin Option */
+        .admin-link {
+            display: block;
+            margin-top: 30px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            text-align: center;
+        }
+
+        #admin-section {
+            display: none;
+        }
+
+        /* Loading Overlay */
+        #loading {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(34, 197, 94, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+        }
+    </style>
 </head>
 
 <body>
-    <nav class="navbar">
-        <a href="index.html" class="logo">CNG Connect</a>
-    </nav>
+    <div class="bg-overlay"></div>
 
-    <div class="container">
-        <div class="login-card">
-            <h2>Select Access Type</h2>
-
-            <!-- User Access -->
-            <div class="access-option">
-                <h3>For Drivers</h3>
-                <p>Find stations, check status, and navigate.</p>
-                <button onclick="loginAsUser()" class="btn btn-primary full-width">Continue as User</button>
-            </div>
-
-            <div class="divider">OR</div>
-
-            <!-- Admin Access -->
-            <div class="access-option">
-                <h3>For Station Managers</h3>
-                <p>Update station status and availability.</p>
-                <form onsubmit="handleAdminLogin(event)" class="login-form">
-                    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required>
-                    <button type="submit" class="btn btn-secondary full-width">Login as Admin</button>
-                </form>
-                <p id="error-msg" class="error-msg"></p>
-            </div>
-        </div>
+    <div id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; font-weight: 600;">Securing Connection...</p>
     </div>
 
-    <script>
-        // Clear any existing session on load
-        localStorage.removeItem('userRole');
+    <div class="login-container">
+        <div class="login-card">
+            <div class="header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h1 style="margin: 0;">CNG Connect</h1>
+                    <select id="langSwitch" onchange="changeLanguage()" style="background: var(--glass-dark); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; outline: none;">
+                        <option value="en-US">English</option>
+                        <option value="ta-IN">தமிழைத் தேர்ந்தெடுக்கவும்</option>
+                    </select>
+                </div>
+                <p id="tagline">Your premium navigation companion</p>
+            </div>
 
-        function loginAsUser() {
-            localStorage.setItem('userRole', 'USER');
-            window.location.href = 'map.html';
+            <div class="login-tabs" id="auth-tabs">
+                <div class="tab active" id="tab-phone" onclick="switchLogin('phone')">Phone</div>
+                <div class="tab" id="tab-email" onclick="switchLogin('email')">Email</div>
+            </div>
+
+            <!-- Phone Login -->
+            <div id="phone-section">
+                <div class="form-group">
+                    <label id="phone-label">Mobile Number</label>
+                    <div class="input-wrapper">
+                        <span class="phone-prefix">+91</span>
+                        <input type="tel" id="p-number" placeholder="Enter 10-digit number" maxlength="10">
+                    </div>
+                </div>
+
+                <div id="otp-section">
+                    <label
+                        style="display:block; font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px;">Enter
+                        OTP</label>
+                    <div class="otp-inputs">
+                        <input type="text" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp2')">
+                        <input type="text" id="otp2" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp3')">
+                        <input type="text" id="otp3" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp4')">
+                        <input type="text" id="otp4" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp5')">
+                        <input type="text" id="otp5" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp6')">
+                        <input type="text" id="otp6" class="otp-box" maxlength="1">
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #64748b;">OTP expires in
+                        <span id="timer">01:59</span>
+                    </p>
+                    <button class="btn btn-primary" style="margin-top: 25px;" onclick="verifyOtp()">Verify &
+                        Continue</button>
+                </div>
+
+                <button class="btn btn-primary" id="send-otp-btn" onclick="sendOtp()">Send One-Time Password</button>
+            </div>
+
+            <!-- Email Section -->
+            <div id="email-section" style="display:none">
+                <input type="hidden" id="email-mode" value="login">
+                <h3 id="email-title" style="text-align: center; color: white; margin-bottom: 20px;">Sign In to CNG Connect</h3>
+                
+                <div class="form-group">
+                    <label id="email-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" placeholder="name@company.com">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="pass-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="pass" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="form-group" id="confirm-pass-group" style="display:none">
+                    <label id="confirm-pass-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirm-pass" placeholder="••••••••">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="email-btn" onclick="emailAction()">Sign In</button>
+                
+                <div style="text-align: center; margin-top: 15px; font-size: 14px; color: #94a3b8;">
+                    <span id="toggle-text">Don't have an account?</span> 
+                    <a href="javascript:void(0)" id="toggle-link" onclick="toggleEmailMode()" style="color: var(--primary); font-weight: 600;">Sign Up</a>
+                </div>
+            </div>
+
+            <!-- Admin Login -->
+            <div id="admin-section">
+                <div class="form-group">
+                    <label>Admin Secret Key</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="adminPass" placeholder="Enter Master Password">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="handleAdminAuth()">Authenticate Admin</button>
+            </div>
+
+            <div class="footer-links" id="main-footer">
+                Need help? <a href="how-it-works.html">View Guide</a>
+            </div>
+
+            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">
+                Station Manager Login?
+      <div id="recaptcha-container"></div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+        const uiLabels = {
+            'en-US': {
+                tagline: 'Your premium navigation companion',
+                tabPhone: 'Phone',
+                tabEmail: 'Email',
+                phoneLabel: 'Mobile Number',
+                pPlaceholder: 'Enter 10-digit number',
+                otpWait: 'OTP expires in',
+                otpBtn: 'Send One-Time Password',
+                otpVerify: 'Verify & Continue',
+                otpLabel: 'Enter OTP',
+                emailLabel: 'Email Address',
+                passLabel: 'Password',
+                confirmLabel: 'Confirm Password',
+                eSignIn: 'Sign In',
+                eSignUp: 'Sign Up',
+                eNoAcc: "Don't have an account?",
+                eHasAcc: 'Already have an account?',
+                eTitleIn: 'Sign In to CNG Connect',
+                eTitleUp: 'Create New Account',
+                adminLink: 'Station Manager Login?',
+                adminBack: 'Back to Driver Login',
+                adminKey: 'Admin Secret Key',
+                adminBtn: 'Authenticate Admin',
+                loadingSecuring: 'Securing Connection...',
+                loadingRecaptcha: 'Securing reCAPTCHA...',
+                loadingVerify: 'Verifying Account...',
+                loadingAuth: 'Authenticating...',
+                loadingCreate: 'Creating Account...',
+                loadingAdmin: 'Granting Admin Rights...'
+            },
+            'ta-IN': {
+                tagline: 'உங்கள் பிரீமியம் வழிசெலுத்தல் துணையாக',
+                tabPhone: 'தொலைபேசி',
+                tabEmail: 'மின்னஞ்சல்',
+                phoneLabel: 'கைபேசி எண்',
+                pPlaceholder: '10 இலக்க எண்ணை உள்ளிடவும்',
+                otpWait: 'OTP காலாவதி ஆகுது',
+                otpBtn: 'ஒரு முறை கடவுச்சொல்லை அனுப்பு',
+                otpVerify: 'சரிபார்த்து தொடரவும்',
+                otpLabel: 'OTP ஐ உள்ளிடவும்',
+                emailLabel: 'மின்னஞ்சல் முகவரி',
+                passLabel: 'கடவுச்சொல்',
+                confirmLabel: 'கடவுச்சொல்லை உறுதியளிக்கவும்',
+                eSignIn: 'உள்நுழைக',
+                eSignUp: 'பதிவு செய்க',
+                eNoAcc: "கணக்கு இல்லையா?",
+                eHasAcc: 'ஏற்கனவே கணக்கு உள்ளதா?',
+                eTitleIn: 'மின்னஞ்சல் மூலம் உள்நுழைக',
+                eTitleUp: 'புதிய கணக்கை உருவாக்கு',
+                adminLink: 'நிலைய மேலாளர் உள்நுழைவு?',
+                adminBack: 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு',
+                adminKey: 'நிர்வாகி ரகசிய சாவி',
+                adminBtn: 'நிர்வாகியை அங்கீகரி',
+                loadingSecuring: 'இணைப்பு பாதுகாக்கப்படுகிறது...',
+                loadingRecaptcha: 'reCAPTCHA பாதுகாக்கப்படுகிறது...',
+                loadingVerify: 'கணக்கு சரிபார்க்கப்படுகிறது...',
+                loadingAuth: 'அங்கீகரிக்கப்படுகிறது...',
+                loadingCreate: 'கணக்கு உருவாக்கப்படுகிறது...',
+                loadingAdmin: 'அட்மின் அதிகாரத்தை வழங்குகிறது...'
+            }
+        };
+
+        function changeLanguage() {
+            const lang = document.getElementById('langSwitch').value;
+            localStorage.setItem('preferredLang', lang);
+            const labels = uiLabels[lang];
+
+            document.getElementById('tagline').innerText = labels.tagline;
+            document.getElementById('tab-phone').innerText = labels.tabPhone;
+            document.getElementById('tab-email').innerText = labels.tabEmail;
+            document.getElementById('phone-label').innerText = labels.phoneLabel;
+            document.getElementById('p-number').placeholder = labels.pPlaceholder;
+            document.getElementById('send-otp-btn').innerText = labels.otpBtn;
+            document.getElementById('email-label').innerText = labels.emailLabel;
+            document.getElementById('pass-label').innerText = labels.passLabel;
+            document.getElementById('confirm-pass-label').innerText = labels.confirmLabel;
+            document.getElementById('adminPass').placeholder = labels.adminBtn;
+            document.querySelector('#admin-section label').innerText = labels.adminKey;
+            document.querySelector('#admin-section button').innerText = labels.adminBtn;
+            document.querySelector('#otp-section label').innerText = labels.otpLabel;
+            document.querySelector('#otp-section button').innerText = labels.otpVerify;
+            
+            const adminLink = document.getElementById('adminSwitch');
+            if (adminLink.innerText !== 'Back to Driver Login' && adminLink.innerText !== 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு') {
+                adminLink.innerText = labels.adminLink;
+            } else {
+                adminLink.innerText = labels.adminBack;
+            }
+
+            // Text nodes for dynamic elements
+            updateEmailModeText();
         }
 
-        function handleAdminLogin(e) {
-            e.preventDefault();
-            const password = document.getElementById('adminPassword').value;
-            const errorMsg = document.getElementById('error-msg');
+        function updateEmailModeText() {
+            const lang = document.getElementById('langSwitch').value;
+            const labels = uiLabels[lang];
+            const mode = document.getElementById('email-mode').value;
+            const title = document.getElementById('email-title');
+            const btn = document.getElementById('email-btn');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleLink = document.getElementById('toggle-link');
 
-            // Simple frontend check as requested
-            if (password === 'admin123') {
-                localStorage.setItem('userRole', 'ADMIN');
-                window.location.href = 'map.html';
+            if (mode === 'signup') {
+                title.innerText = labels.eTitleUp;
+                btn.innerText = labels.eSignUp;
+                toggleText.innerText = labels.eHasAcc;
+                toggleLink.innerText = labels.eSignIn;
             } else {
-                errorMsg.textContent = "Invalid Password";
-                errorMsg.style.display = 'block';
+                title.innerText = labels.eTitleIn;
+                btn.innerText = labels.eSignIn;
+                toggleText.innerText = labels.eNoAcc;
+                toggleLink.innerText = labels.eSignUp;
             }
+        }
+
+        // Initialize Lang
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLang') || 'ta-IN';
+            document.getElementById('langSwitch').value = savedLang;
+            changeLanguage();
+        });
+
+        // --- HYBRID FIREBASE CONFIG ---
+        // Updated with your actual live keys
+        const firebaseConfig = {
+            apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
+            authDomain: "cng--connect.firebaseapp.com",
+            projectId: "cng--connect",
+            storageBucket: "cng--connect.firebasestorage.app",
+            messagingSenderId: "972459633108",
+            appId: "1:972459633108:web:d73c4a2931f1ac7adbce41",
+            measurementId: "G-SZ7LH2ZEK6"
+        };
+
+        // Detect if keys are provided or still placeholders
+        const isFirebaseActive = firebaseConfig.apiKey !== "YOUR_API_KEY";
+        
+        if (isFirebaseActive) {
+            firebase.initializeApp(firebaseConfig);
+            console.log("🔥 Firebase Auth Active");
+        } else {
+            console.log("🛠️ Running in Simulation Mode (No Firebase Keys)");
+        }
+
+        let confirmationResult = null;
+        localStorage.removeItem('userRole');
+
+        function switchLogin(type) {
+            const tabs = document.querySelectorAll('.tab');
+            const pSection = document.getElementById('phone-section');
+            const eSection = document.getElementById('email-section');
+            const aSection = document.getElementById('admin-section');
+            const authTabs = document.getElementById('auth-tabs');
+            const adminSwitch = document.getElementById('adminSwitch');
+
+            pSection.style.display = 'none';
+            eSection.style.display = 'none';
+            aSection.style.display = 'none';
+            authTabs.style.display = 'flex';
+            adminSwitch.style.display = 'block';
+            tabs.forEach(t => t.classList.remove('active'));
+
+            if (type === 'phone') {
+                pSection.style.display = 'block';
+                tabs[0].classList.add('active');
+            } else if (type === 'email') {
+                eSection.style.display = 'block';
+                tabs[1].classList.add('active');
+            } else {
+                aSection.style.display = 'block';
+                authTabs.style.display = 'none';
+                adminSwitch.innerText = 'Back to Driver Login';
+                adminSwitch.onclick = () => location.reload();
+            }
+        }
+
+        async function sendOtp() {
+            const num = document.getElementById('p-number').value;
+            if (num.length !== 10) return alert("Please enter a valid 10-digit number");
+
+            if (isFirebaseActive) {
+                const phoneNumber = "+91" + num;
+                showLoading("Securing reCAPTCHA...");
+                try {
+                    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
+                    confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+                    document.getElementById('loading').style.display = 'none';
+                    proceedToOtp();
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    alert("Firebase Error: " + error.message);
+                }
+            } else {
+                // Simulation Mode
+                proceedToOtp();
+            }
+        }
+
+        function proceedToOtp() {
+            document.getElementById('send-otp-btn').style.display = 'none';
+            document.getElementById('otp-section').style.display = 'block';
+            startTimer();
+        }
+
+        function startTimer() {
+            let duration = 119;
+            const timerDisplay = document.getElementById('timer');
+            const countdown = setInterval(() => {
+                let minutes = parseInt(duration / 60, 10);
+                let seconds = parseInt(duration % 60, 10);
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+                timerDisplay.textContent = minutes + ":" + seconds;
+                if (--duration < 0) clearInterval(countdown);
+            }, 1000);
+        }
+
+        function moveNext(curr, nextId) {
+            if (curr.value.length >= 1) {
+                const next = document.getElementById(nextId);
+                if(next) next.focus();
+            }
+        }
+
+        async function verifyOtp() {
+            const code = Array.from(document.querySelectorAll('.otp-box')).map(el => el.value).join('');
+            if (code.length < 6 && isFirebaseActive) return alert("Firebase requires a 6-digit code");
+            if (code.length < 4 && !isFirebaseActive) return alert("Enter full OTP");
+
+            showLoading("Verifying Account...");
+
+            if (isFirebaseActive) {
+                try {
+                    await confirmationResult.confirm(code);
+                    localStorage.setItem('userRole', 'USER');
+                    window.location.href = 'map.html';
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    alert("Invalid Code");
+                }
+            } else {
+                // Simulation Mode
+                setTimeout(() => {
+                    localStorage.setItem('userRole', 'USER');
+                    window.location.href = 'map.html';
+                }, 1000);
+            }
+        }
+
+        function toggleEmailMode() {
+            const mode = document.getElementById('email-mode');
+            const confirmGroup = document.getElementById('confirm-pass-group');
+
+            if (mode.value === 'login') {
+                mode.value = 'signup';
+                confirmGroup.style.display = 'block';
+            } else {
+                mode.value = 'login';
+                confirmGroup.style.display = 'none';
+            }
+            updateEmailModeText();
+        }
+
+        async function emailAction() {
+            const mode = document.getElementById('email-mode').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('pass').value;
+            const confirmPass = document.getElementById('confirm-pass').value;
+
+            if (!email || !password) return alert("Please fill all fields");
+            if (mode === 'signup' && password !== confirmPass) return alert("Passwords do not match");
+
+            showLoading(mode === 'signup' ? "Creating Account..." : "Authenticating...");
+
+            if (isFirebaseActive) {
+                try {
+                    if (mode === 'signup') {
+                        await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    } else {
+                        await firebase.auth().signInWithEmailAndPassword(email, password);
+                    }
+                    localStorage.setItem('userRole', 'USER');
+                    window.location.href = 'map.html';
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    alert("Auth Error: " + error.message);
+                }
+            } else {
+                // Simulation Mode
+                setTimeout(() => {
+                    localStorage.setItem('userRole', 'USER');
+                    window.location.href = 'map.html';
+                }, 1000);
+            }
+        }
+
+        function handleAdminAuth() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === 'admin123') {
+                showLoading("Granting Admin Rights...");
+                localStorage.setItem('userRole', 'ADMIN');
+                setTimeout(() => window.location.href = 'map.html', 1000);
+            } else {
+                alert("Invalid Admin Key");
+            }
+        }
+
+        function showLoading(msg) {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').querySelector('p').innerText = msg;
         }
     </script>
 </body>

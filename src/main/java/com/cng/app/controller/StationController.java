@@ -42,6 +42,10 @@ public class StationController {
             station.setQueueTime(stationDetails.getQueueTime());
             station.setLastUpdated(stationDetails.getLastUpdated());
             station.setAdminId(stationDetails.getAdminId());
+            station.setFuelType(stationDetails.getFuelType());
+            station.setEvPowerKW(stationDetails.getEvPowerKW());
+            station.setConnectorTypes(stationDetails.getConnectorTypes());
+            station.setOperator(stationDetails.getOperator());
             return stationRepo.save(station);
         }).orElse(null);
     }

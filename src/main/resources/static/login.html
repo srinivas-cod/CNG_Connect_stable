@@ -396,7 +396,7 @@
 
             <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">
                 Station Manager Login?
-      <div id="recaptcha-container"></div>
+            </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -586,15 +586,26 @@
 
             if (isFirebaseActive) {
                 const phoneNumber = "+91" + num;
-                showLoading("Securing reCAPTCHA...");
+                showLoading(labels.loadingRecaptcha);
                 try {
-                    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
+                    if (!window.recaptchaVerifier) {
+                        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 
+                            'size': 'invisible',
+                            'callback': (response) => {
+                                console.log("reCAPTCHA solved");
+                            }
+                        });
+                    }
                     confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
                     document.getElementById('loading').style.display = 'none';
                     proceedToOtp();
                 } catch (error) {
                     document.getElementById('loading').style.display = 'none';
-                    alert("Firebase Error: " + error.message);
+                    console.error("Firebase Error:", error);
+                    if (confirm("Firebase error: " + error.message + "\n\nWould you like to enter Demo Mode (123456) instead?")) {
+                        isFirebaseActive = false;
+                        proceedToOtp();
+                    }
                 }
             } else {
                 // Simulation Mode
@@ -716,6 +727,7 @@
             document.getElementById('loading').querySelector('p').innerText = msg;
         }
     </script>
+    <div id="recaptcha-container"></div>
 </body>
 
 </html>

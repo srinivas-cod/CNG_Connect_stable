@@ -1612,10 +1612,22 @@
               startLatLng = await waitGPS();
             }
           } else {
-            startLatLng = await getCoordinates(start);
+            try {
+                startLatLng = await getCoordinates(start);
+            } catch (e) {
+                console.warn("Retrying start location with broader search...");
+                const simpleStart = typeof start === 'string' ? start.split(',')[0] : start;
+                startLatLng = await getCoordinates(simpleStart);
+            }
           }
 
-          const endLatLng = await getCoordinates(end);
+          try {
+            endLatLng = await getCoordinates(end);
+          } catch (e) {
+            console.warn("Retrying end location with broader search...");
+            const simpleEnd = typeof end === 'string' ? end.split(',')[0] : end;
+            endLatLng = await getCoordinates(simpleEnd);
+          }
 
           waypoints = [
             { latLng: L.latLng(startLatLng.lat, startLatLng.lng), name: start },

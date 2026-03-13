@@ -46,7 +46,6 @@
             width: 90%;
             max-width: 420px;
             z-index: 10;
-            perspective: 1000px;
         }
 
         .login-card {
@@ -56,19 +55,6 @@
             padding: 40px;
             border-radius: 30px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(50px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
         }
 
         .header {
@@ -79,17 +65,10 @@
         .header h1 {
             font-size: 28px;
             font-weight: 700;
-            letter-spacing: -0.5px;
             background: linear-gradient(to right, #4ade80, #3b82f6);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
-        }
-
-        .header p {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-top: 5px;
         }
 
         .login-tabs {
@@ -119,7 +98,6 @@
 
         .form-group {
             margin-bottom: 20px;
-            position: relative;
         }
 
         .form-group label {
@@ -127,9 +105,7 @@
             font-size: 12px;
             color: #94a3b8;
             margin-bottom: 8px;
-            font-weight: 500;
             text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .input-wrapper {
@@ -139,80 +115,37 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             padding: 5px 15px;
-            transition: all 0.3s;
-        }
-
-        .input-wrapper:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
         }
 
         .input-wrapper input {
             background: transparent;
             border: none;
             color: white;
-            padding: 10px 5px;
+            padding: 10px;
             width: 100%;
             outline: none;
             font-size: 16px;
-        }
-
-        .phone-prefix {
-            color: #64748b;
-            font-weight: 600;
-            margin-right: 10px;
-            padding-right: 10px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .btn {
             width: 100%;
             padding: 15px;
             border: none;
-            border-radius: 15px;
+            border-radius: 12px;
             font-weight: 700;
-            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
+            transition: 0.3s;
         }
 
         .btn-primary {
             background: var(--primary);
             color: white;
-            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4);
         }
 
         .btn-primary:hover {
-            background: #16a34a;
             transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        #otp-section {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.5);
         }
 
         .otp-inputs {
@@ -235,10 +168,6 @@
             outline: none;
         }
 
-        .otp-box:focus {
-            border-color: var(--primary);
-        }
-
         .footer-links {
             text-align: center;
             font-size: 13px;
@@ -246,13 +175,6 @@
             margin-top: 20px;
         }
 
-        .footer-links a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        /* Admin Option */
         .admin-link {
             display: block;
             margin-top: 30px;
@@ -262,11 +184,6 @@
             text-align: center;
         }
 
-        #admin-section {
-            display: none;
-        }
-
-        /* Loading Overlay */
         #loading {
             display: none;
             position: fixed;
@@ -286,11 +203,17 @@
             border-radius: 50%;
             animation: spin 1s infinite linear;
         }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 
 <body>
     <div class="bg-overlay"></div>
+    <div id="recaptcha-container"></div>
 
     <div id="loading">
         <div class="spinner"></div>
@@ -300,48 +223,43 @@
     <div class="login-container">
         <div class="login-card">
             <div class="header">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h1 style="margin: 0;">CNG Connect</h1>
-                    <select id="langSwitch" onchange="changeLanguage()" style="background: var(--glass-dark); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; font-size: 12px; cursor: pointer; outline: none;">
+                <h1>CNG Connect</h1>
+                <p id="tagline">Your premium navigation companion</p>
+                <div style="margin-top: 15px;">
+                    <select id="langSwitch" onchange="changeLanguage()" style="background: var(--glass-dark); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 12px;">
                         <option value="en-US">English</option>
-                        <option value="ta-IN">தமிழைத் தேர்ந்தெடுக்கவும்</option>
+                        <option value="ta-IN">தமிழ்</option>
                     </select>
                 </div>
-                <p id="tagline">Your premium navigation companion</p>
             </div>
 
             <div class="login-tabs" id="auth-tabs">
-                <div class="tab active" id="tab-phone" onclick="switchLogin('phone')">Phone</div>
-                <div class="tab" id="tab-email" onclick="switchLogin('email')">Email</div>
+                <div class="tab active" onclick="switchLogin('phone')" id="tab-phone">Phone</div>
+                <div class="tab" onclick="switchLogin('email')" id="tab-email">Email</div>
             </div>
 
             <!-- Phone Login -->
             <div id="phone-section">
-                <div class="form-group">
+                <div class="form-group" id="phone-input-group">
                     <label id="phone-label">Mobile Number</label>
                     <div class="input-wrapper">
-                        <span class="phone-prefix">+91</span>
-                        <input type="tel" id="p-number" placeholder="Enter 10-digit number" maxlength="10">
+                        <span style="color: #64748b; font-weight: 600; margin-right: 10px;">+91</span>
+                        <input type="text" id="p-number" placeholder="Enter 10-digit number" />
                     </div>
                 </div>
 
-                <div id="otp-section">
-                    <label
-                        style="display:block; font-size: 12px; color: #94a3b8; text-transform: uppercase; margin-bottom: 10px;">Enter
-                        OTP</label>
+                <div id="otp-section" style="display:none">
+                    <label style="display:block; font-size: 12px; color: #94a3b8; text-transform: uppercase;">Enter OTP</label>
                     <div class="otp-inputs">
-                        <input type="text" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp2')">
+                        <input type="text" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp2')" id="otp1">
                         <input type="text" id="otp2" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp3')">
                         <input type="text" id="otp3" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp4')">
                         <input type="text" id="otp4" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp5')">
                         <input type="text" id="otp5" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp6')">
                         <input type="text" id="otp6" class="otp-box" maxlength="1">
                     </div>
-                    <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #64748b;">OTP expires in
-                        <span id="timer">01:59</span>
-                    </p>
-                    <button class="btn btn-primary" style="margin-top: 25px;" onclick="verifyOtp()">Verify &
-                        Continue</button>
+                    <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #64748b;">OTP expires in <span id="timer">01:59</span></p>
+                    <button class="btn btn-primary" style="margin-top: 25px;" onclick="verifyOtp()">Verify & Continue</button>
                 </div>
 
                 <button class="btn btn-primary" id="send-otp-btn" onclick="sendOtp()">Send One-Time Password</button>
@@ -350,56 +268,45 @@
             <!-- Email Section -->
             <div id="email-section" style="display:none">
                 <input type="hidden" id="email-mode" value="login">
-                <h3 id="email-title" style="text-align: center; color: white; margin-bottom: 20px;">Sign In to CNG Connect</h3>
-                
+                <h3 id="email-title" style="text-align: center; color: white; margin-bottom: 20px;">Sign In</h3>
                 <div class="form-group">
                     <label id="email-label">Email Address</label>
-                    <div class="input-wrapper">
-                        <input type="email" id="email" placeholder="name@company.com">
-                    </div>
+                    <div class="input-wrapper"><input type="email" id="email" placeholder="name@company.com"></div>
                 </div>
                 <div class="form-group">
                     <label id="pass-label">Password</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="pass" placeholder="••••••••">
-                    </div>
+                    <div class="input-wrapper"><input type="password" id="pass" placeholder="••••••••"></div>
                 </div>
                 <div class="form-group" id="confirm-pass-group" style="display:none">
                     <label id="confirm-pass-label">Confirm Password</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="confirm-pass" placeholder="••••••••">
-                    </div>
+                    <div class="input-wrapper"><input type="password" id="confirm-pass" placeholder="••••••••"></div>
                 </div>
-                
                 <button class="btn btn-primary" id="email-btn" onclick="emailAction()">Sign In</button>
-                
-                <div style="text-align: center; margin-top: 15px; font-size: 14px; color: #94a3b8;">
+                <p style="text-align: center; margin-top: 20px; font-size: 13px; color: #94a3b8;">
                     <span id="toggle-text">Don't have an account?</span> 
                     <a href="javascript:void(0)" id="toggle-link" onclick="toggleEmailMode()" style="color: var(--primary); font-weight: 600;">Sign Up</a>
-                </div>
+                </p>
             </div>
 
             <!-- Admin Login -->
-            <div id="admin-section">
+            <div id="admin-section" style="display:none">
                 <div class="form-group">
                     <label>Admin Secret Key</label>
-                    <div class="input-wrapper">
-                        <input type="password" id="adminPass" placeholder="Enter Master Password">
-                    </div>
+                    <div class="input-wrapper"><input type="password" id="adminPass" placeholder="Enter Master Password"></div>
                 </div>
                 <button class="btn btn-primary" onclick="handleAdminAuth()">Authenticate Admin</button>
             </div>
 
-            <div class="footer-links" id="main-footer">
+            <div class="footer-links">
                 Need help? <a href="how-it-works.html">View Guide</a><br><br>
-                <div style="opacity: 0.4; font-size: 10px; cursor: pointer;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
-                   ⚠️ Dev Bypass: Force Login to Map
+                <div style="opacity: 0.3; font-size: 10px; cursor: pointer; text-decoration: underline;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
+                    ⚠️ Developer Bypass: Enter Map Directly
                 </div>
             </div>
 
-            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">
-                Station Manager Login?
-            </div>
+            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">Station Manager Login?</div>
+        </div>
+    </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -409,72 +316,49 @@
         const uiLabels = {
             'en-US': {
                 tagline: 'Your premium navigation companion',
-                tabPhone: 'Phone',
-                tabEmail: 'Email',
-                phoneLabel: 'Mobile Number',
-                pPlaceholder: 'Enter 10-digit number',
-                otpWait: 'OTP expires in',
-                otpBtn: 'Send One-Time Password',
-                otpVerify: 'Verify & Continue',
-                otpLabel: 'Enter OTP',
-                emailLabel: 'Email Address',
-                passLabel: 'Password',
-                confirmLabel: 'Confirm Password',
-                eSignIn: 'Sign In',
-                eSignUp: 'Sign Up',
-                eNoAcc: "Don't have an account?",
-                eHasAcc: 'Already have an account?',
-                eTitleIn: 'Sign In to CNG Connect',
-                eTitleUp: 'Create New Account',
-                adminLink: 'Station Manager Login?',
-                adminBack: 'Back to Driver Login',
-                adminKey: 'Admin Secret Key',
-                adminBtn: 'Authenticate Admin',
-                loadingSecuring: 'Securing Connection...',
-                loadingRecaptcha: 'Securing reCAPTCHA...',
-                loadingVerify: 'Verifying Account...',
-                loadingAuth: 'Authenticating...',
-                loadingCreate: 'Creating Account...',
+                tabPhone: 'Phone', tabEmail: 'Email', phoneLabel: 'Mobile Number', pPlaceholder: 'Enter 10-digit number',
+                otpWait: 'OTP expires in', otpBtn: 'Send One-Time Password', otpVerify: 'Verify & Continue',
+                otpLabel: 'Enter OTP', emailLabel: 'Email Address', passLabel: 'Password', confirmLabel: 'Confirm Password',
+                eSignIn: 'Sign In', eSignUp: 'Sign Up', eNoAcc: "Don't have an account?", eHasAcc: 'Already have an account?',
+                eTitleIn: 'Sign In to CNG Connect', eTitleUp: 'Create New Account', adminLink: 'Station Manager Login?',
+                adminBack: 'Back to Driver Login', adminKey: 'Admin Secret Key', adminBtn: 'Authenticate Admin',
+                loadingSecuring: 'Securing Connection...', loadingRecaptcha: 'Securing reCAPTCHA...',
+                loadingVerify: 'Verifying Account...', loadingAuth: 'Authenticating...', loadingCreate: 'Creating Account...',
                 loadingAdmin: 'Granting Admin Rights...'
             },
             'ta-IN': {
                 tagline: 'உங்கள் பிரீமியம் வழிசெலுத்தல் துணையாக',
-                tabPhone: 'தொலைபேசி',
-                tabEmail: 'மின்னஞ்சல்',
-                phoneLabel: 'கைபேசி எண்',
-                pPlaceholder: '10 இலக்க எண்ணை உள்ளிடவும்',
-                otpWait: 'OTP காலாவதி ஆகுது',
-                otpBtn: 'ஒரு முறை கடவுச்சொல்லை அனுப்பு',
-                otpVerify: 'சரிபார்த்து தொடரவும்',
-                otpLabel: 'OTP ஐ உள்ளிடவும்',
-                emailLabel: 'மின்னஞ்சல் முகவரி',
-                passLabel: 'கடவுச்சொல்',
-                confirmLabel: 'கடவுச்சொல்லை உறுதியளிக்கவும்',
-                eSignIn: 'உள்நுழைக',
-                eSignUp: 'பதிவு செய்க',
-                eNoAcc: "கணக்கு இல்லையா?",
-                eHasAcc: 'ஏற்கனவே கணக்கு உள்ளதா?',
-                eTitleIn: 'மின்னஞ்சல் மூலம் உள்நுழைக',
-                eTitleUp: 'புதிய கணக்கை உருவாக்கு',
-                adminLink: 'நிலைய மேலாளர் உள்நுழைவு?',
-                adminBack: 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு',
-                adminKey: 'நிர்வாகி ரகசிய சாவி',
-                adminBtn: 'நிர்வாகியை அங்கீகரி',
-                loadingSecuring: 'இணைப்பு பாதுகாக்கப்படுகிறது...',
-                loadingRecaptcha: 'reCAPTCHA பாதுகாக்கப்படுகிறது...',
-                loadingVerify: 'கணக்கு சரிபார்க்கப்படுகிறது...',
-                loadingAuth: 'அங்கீகரிக்கப்படுகிறது...',
-                loadingCreate: 'கணக்கு உருவாக்கப்படுகிறது...',
+                tabPhone: 'தொலைபேசி', tabEmail: 'மின்னஞ்சல்', phoneLabel: 'கைபேசி எண்', pPlaceholder: '10 இலக்க எண்ணை உள்ளிடவும்',
+                otpWait: 'OTP காலாவதி ஆகுது', otpBtn: 'ஒரு முறை கடவுச்சொல்லை அனுப்பு', otpVerify: 'சரிபார்த்து தொடரவும்',
+                otpLabel: 'OTP ஐ உள்ளிடவும்', emailLabel: 'மின்னஞ்சல் முகவரி', passLabel: 'கடவுச்சொல்', confirmLabel: 'கடவுச்சொல்லை உறுதியளிக்கவும்',
+                eSignIn: 'உள்நுழைக', eSignUp: 'பதிவு செய்க', eNoAcc: "கணக்கு இல்லையா?", eHasAcc: 'ஏற்கனவே கணக்கு உள்ளதா?',
+                eTitleIn: 'மின்னஞ்சல் மூலம் உள்நுழைக', eTitleUp: 'புதிய கணக்கை உருவாக்கு', adminLink: 'நிலைய மேலாளர் உள்நுழைவு?',
+                adminBack: 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு', adminKey: 'நிர்வாகி ரகசிய சாவி', adminBtn: 'நிர்வாகியை அங்கீகரி',
+                loadingSecuring: 'இணைப்பு பாதுகாக்கப்படுகிறது...', loadingRecaptcha: 'reCAPTCHA பாதுகாக்கப்படுகிறது...',
+                loadingVerify: 'கணக்கு சரிபார்க்கப்படுகிறது...', loadingAuth: 'அங்கீகரிக்கப்படுகிறது...', loadingCreate: 'கணக்கு உருவாக்கப்படுகிறது...',
                 loadingAdmin: 'அட்மின் அதிகாரத்தை வழங்குகிறது...'
             }
         };
 
         let labels = uiLabels['ta-IN'];
+        const firebaseConfig = {
+            apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
+            authDomain: "cng--connect.firebaseapp.com",
+            projectId: "cng--connect",
+            storageBucket: "cng--connect.firebasestorage.app",
+            messagingSenderId: "972459633108",
+            appId: "1:972459633108:web:d73c4a2931f1ac7adbce41"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        let confirmationResult = null;
+        let isFirebaseActive = true;
+
         function changeLanguage() {
             const lang = document.getElementById('langSwitch').value;
             localStorage.setItem('preferredLang', lang);
             labels = uiLabels[lang];
-
+            
             document.getElementById('tagline').innerText = labels.tagline;
             document.getElementById('tab-phone').innerText = labels.tabPhone;
             document.getElementById('tab-email').innerText = labels.tabEmail;
@@ -491,138 +375,73 @@
             document.querySelector('#otp-section button').innerText = labels.otpVerify;
             
             const adminLink = document.getElementById('adminSwitch');
-            if (adminLink.innerText !== 'Back to Driver Login' && adminLink.innerText !== 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு') {
+            if (adminLink.innerText.includes('Login') || adminLink.innerText.includes('உள்நுழைவு')) {
                 adminLink.innerText = labels.adminLink;
             } else {
                 adminLink.innerText = labels.adminBack;
             }
-
-            // Text nodes for dynamic elements
             updateEmailModeText();
         }
 
         function updateEmailModeText() {
             const lang = document.getElementById('langSwitch').value;
-            const labels = uiLabels[lang];
+            const l = uiLabels[lang];
             const mode = document.getElementById('email-mode').value;
-            const title = document.getElementById('email-title');
-            const btn = document.getElementById('email-btn');
-            const toggleText = document.getElementById('toggle-text');
-            const toggleLink = document.getElementById('toggle-link');
-
             if (mode === 'signup') {
-                title.innerText = labels.eTitleUp;
-                btn.innerText = labels.eSignUp;
-                toggleText.innerText = labels.eHasAcc;
-                toggleLink.innerText = labels.eSignIn;
+                document.getElementById('email-title').innerText = l.eTitleUp;
+                document.getElementById('email-btn').innerText = l.eSignUp;
+                document.getElementById('toggle-text').innerText = l.eHasAcc;
+                document.getElementById('toggle-link').innerText = l.eSignIn;
             } else {
-                title.innerText = labels.eTitleIn;
-                btn.innerText = labels.eSignIn;
-                toggleText.innerText = labels.eNoAcc;
-                toggleLink.innerText = labels.eSignUp;
+                document.getElementById('email-title').innerText = l.eTitleIn;
+                document.getElementById('email-btn').innerText = l.eSignIn;
+                document.getElementById('toggle-text').innerText = l.eNoAcc;
+                document.getElementById('toggle-link').innerText = l.eSignUp;
             }
         }
-
-        // Initialize Lang
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedLang = localStorage.getItem('preferredLang') || 'ta-IN';
-            document.getElementById('langSwitch').value = savedLang;
-            changeLanguage();
-        });
-
-        // --- HYBRID FIREBASE CONFIG ---
-        // Updated with your actual live keys
-        const firebaseConfig = {
-            apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
-            authDomain: "cng--connect.firebaseapp.com",
-            projectId: "cng--connect",
-            storageBucket: "cng--connect.firebasestorage.app",
-            messagingSenderId: "972459633108",
-            appId: "1:972459633108:web:d73c4a2931f1ac7adbce41",
-            measurementId: "G-SZ7LH2ZEK6"
-        };
-
-        // Detect if keys are provided or still placeholders
-        let isFirebaseActive = firebaseConfig.apiKey !== "YOUR_API_KEY";
-        
-        if (isFirebaseActive) {
-            firebase.initializeApp(firebaseConfig);
-            console.log("🔥 Firebase Auth Active");
-        } else {
-            console.log("🛠️ Running in Simulation Mode (No Firebase Keys)");
-        }
-
-        let confirmationResult = null;
-        localStorage.removeItem('userRole');
 
         function switchLogin(type) {
             const tabs = document.querySelectorAll('.tab');
-            const pSection = document.getElementById('phone-section');
-            const eSection = document.getElementById('email-section');
-            const aSection = document.getElementById('admin-section');
+            const p = document.getElementById('phone-section');
+            const e = document.getElementById('email-section');
+            const a = document.getElementById('admin-section');
             const authTabs = document.getElementById('auth-tabs');
             const adminSwitch = document.getElementById('adminSwitch');
 
-            pSection.style.display = 'none';
-            eSection.style.display = 'none';
-            aSection.style.display = 'none';
-            authTabs.style.display = 'flex';
-            adminSwitch.style.display = 'block';
+            p.style.display = 'none'; e.style.display = 'none'; a.style.display = 'none';
+            authTabs.style.display = 'flex'; adminSwitch.style.display = 'block';
             tabs.forEach(t => t.classList.remove('active'));
 
-            if (type === 'phone') {
-                pSection.style.display = 'block';
-                tabs[0].classList.add('active');
-            } else if (type === 'email') {
-                eSection.style.display = 'block';
-                tabs[1].classList.add('active');
-            } else {
-                aSection.style.display = 'block';
-                authTabs.style.display = 'none';
-                adminSwitch.innerText = 'Back to Driver Login';
-                adminSwitch.onclick = () => location.reload();
-            }
+            if (type === 'phone') { p.style.display = 'block'; tabs[0].classList.add('active'); }
+            else if (type === 'email') { e.style.display = 'block'; tabs[1].classList.add('active'); }
+            else { a.style.display = 'block'; authTabs.style.display = 'none'; adminSwitch.innerText = labels.adminBack; }
         }
 
         async function sendOtp() {
             const num = document.getElementById('p-number').value;
             if (num.length !== 10) return alert("Please enter a valid 10-digit number");
 
-            if (isFirebaseActive) {
-                const phoneNumber = "+91" + num;
-                console.log("Attempting OTP for:", phoneNumber);
-                showLoading(labels ? labels.loadingRecaptcha : "Securing...");
-                
-                try {
-                    if (!window.recaptchaVerifier) {
-                        console.log("Initializing Recaptcha...");
-                        window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 
-                            'size': 'invisible'
-                        });
-                    }
-                    
-                    console.log("Calling signInWithPhoneNumber...");
-                    confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-                    console.log("OTP Sent Successfully");
-                    
-                    document.getElementById('loading').style.display = 'none';
-                    proceedToOtp();
-                } catch (error) {
-                    document.getElementById('loading').style.display = 'none';
-                    console.error("FIREBASE FAIL:", error);
-                    
-                    if (confirm("Firebase error: " + (error.code || error.message) + "\n\nWould you like to enter Demo Mode (123456) instead?")) {
-                        isFirebaseActive = false;
-                        proceedToOtp();
-                    }
+            showLoading(labels.loadingRecaptcha);
+            try {
+                if (!window.recaptchaVerifier) {
+                    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
                 }
-            } else {
-                // Simulation Mode
+                const phoneNumber = "+91" + num;
+                confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+                hideLoading();
                 proceedToOtp();
+            } catch (error) {
+                hideLoading();
+                console.error(error);
+                if (confirm("Firebase error: " + error.message + "\n\nUse Demo Mode (OTP: 123456)?")) {
+                    isFirebaseActive = false;
+                    proceedToOtp();
+                }
             }
         }
 
         function proceedToOtp() {
+            document.getElementById('phone-input-group').style.display = 'none';
             document.getElementById('send-otp-btn').style.display = 'none';
             document.getElementById('otp-section').style.display = 'block';
             startTimer();
@@ -630,116 +449,86 @@
 
         function startTimer() {
             let duration = 119;
-            const timerDisplay = document.getElementById('timer');
-            const countdown = setInterval(() => {
-                let minutes = parseInt(duration / 60, 10);
-                let seconds = parseInt(duration % 60, 10);
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-                timerDisplay.textContent = minutes + ":" + seconds;
-                if (--duration < 0) clearInterval(countdown);
+            const display = document.getElementById('timer');
+            const interval = setInterval(() => {
+                let m = parseInt(duration / 60, 10);
+                let s = parseInt(duration % 60, 10);
+                display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+                if (--duration < 0) clearInterval(interval);
             }, 1000);
         }
 
         function moveNext(curr, nextId) {
             if (curr.value.length >= 1) {
-                const next = document.getElementById(nextId);
-                if(next) next.focus();
+                const n = document.getElementById(nextId);
+                if(n) n.focus();
             }
         }
 
         async function verifyOtp() {
             const code = Array.from(document.querySelectorAll('.otp-box')).map(el => el.value).join('');
-            if (code.length < 6 && isFirebaseActive) return alert("Firebase requires a 6-digit code");
-            if (code.length < 4 && !isFirebaseActive) return alert("Enter full OTP");
-
-            showLoading("Verifying Account...");
-
+            if (code.length < 6 && isFirebaseActive) return alert("Enter 6-digit code");
+            
+            showLoading(labels.loadingVerify);
             if (isFirebaseActive) {
                 try {
                     await confirmationResult.confirm(code);
-                    localStorage.setItem('userRole', 'USER');
-                    window.location.href = 'map.html';
-                } catch (error) {
-                    document.getElementById('loading').style.display = 'none';
-                    alert("Invalid Code");
-                }
+                    loginSuccess('USER');
+                } catch (e) { hideLoading(); alert("Invalid Code"); }
             } else {
-                // Simulation Mode
-                setTimeout(() => {
-                    localStorage.setItem('userRole', 'USER');
-                    window.location.href = 'map.html';
-                }, 1000);
+                if(code === '123456' || code === '1234') loginSuccess('USER');
+                else { hideLoading(); alert("Invalid Demo Code"); }
             }
+        }
+
+        function loginSuccess(role) {
+            localStorage.setItem('userRole', role);
+            window.location.href = 'map.html';
         }
 
         function toggleEmailMode() {
             const mode = document.getElementById('email-mode');
-            const confirmGroup = document.getElementById('confirm-pass-group');
-
-            if (mode.value === 'login') {
-                mode.value = 'signup';
-                confirmGroup.style.display = 'block';
-            } else {
-                mode.value = 'login';
-                confirmGroup.style.display = 'none';
-            }
+            mode.value = (mode.value === 'login') ? 'signup' : 'login';
+            document.getElementById('confirm-pass-group').style.display = (mode.value === 'signup') ? 'block' : 'none';
             updateEmailModeText();
         }
 
         async function emailAction() {
-            const mode = document.getElementById('email-mode').value;
             const email = document.getElementById('email').value;
-            const password = document.getElementById('pass').value;
-            const confirmPass = document.getElementById('confirm-pass').value;
-
-            if (!email || !password) return alert("Please fill all fields");
-            if (mode === 'signup' && password !== confirmPass) return alert("Passwords do not match");
-
-            showLoading(mode === 'signup' ? "Creating Account..." : "Authenticating...");
-
-            if (isFirebaseActive) {
-                try {
-                    if (mode === 'signup') {
-                        await firebase.auth().createUserWithEmailAndPassword(email, password);
-                    } else {
-                        await firebase.auth().signInWithEmailAndPassword(email, password);
-                    }
-                    localStorage.setItem('userRole', 'USER');
-                    window.location.href = 'map.html';
-                } catch (error) {
-                    document.getElementById('loading').style.display = 'none';
-                    alert("Auth Error: " + error.message);
-                }
-            } else {
-                // Simulation Mode
-                setTimeout(() => {
-                    localStorage.setItem('userRole', 'USER');
-                    window.location.href = 'map.html';
-                }, 1000);
-            }
+            const pass = document.getElementById('pass').value;
+            if (!email || !pass) return alert("Fill all fields");
+            
+            showLoading(labels.loadingAuth);
+            try {
+                const mode = document.getElementById('email-mode').value;
+                if (mode === 'signup') await firebase.auth().createUserWithEmailAndPassword(email, pass);
+                else await firebase.auth().signInWithEmailAndPassword(email, pass);
+                loginSuccess('USER');
+            } catch (e) { hideLoading(); alert(e.message); }
         }
 
         function handleAdminAuth() {
             const pass = document.getElementById('adminPass').value;
             if (pass === 'admin123') {
-                showLoading("Granting Admin Rights...");
-                localStorage.setItem('userRole', 'ADMIN');
-                setTimeout(() => window.location.href = 'map.html', 1000);
-            } else {
-                alert("Invalid Admin Key");
-            }
+                showLoading(labels.loadingAdmin);
+                loginSuccess('ADMIN');
+            } else alert("Invalid Admin Key");
         }
 
         function showLoading(msg) {
-            const loading = document.getElementById('loading');
-            if(loading) {
-                loading.style.display = 'flex';
-                loading.querySelector('p').innerText = msg;
-            }
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').querySelector('p').innerText = msg;
         }
-    </script>
-    <div id="recaptcha-container"></div>
-</body>
 
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('preferredLang') || 'ta-IN';
+            document.getElementById('langSwitch').value = saved;
+            changeLanguage();
+        };
+    </script>
+</body>
 </html>

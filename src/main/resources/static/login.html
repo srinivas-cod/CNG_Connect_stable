@@ -539,7 +539,7 @@
         };
 
         // Detect if keys are provided or still placeholders
-        const isFirebaseActive = firebaseConfig.apiKey !== "YOUR_API_KEY";
+        let isFirebaseActive = firebaseConfig.apiKey !== "YOUR_API_KEY";
         
         if (isFirebaseActive) {
             firebase.initializeApp(firebaseConfig);
@@ -586,23 +586,29 @@
 
             if (isFirebaseActive) {
                 const phoneNumber = "+91" + num;
+                console.log("Attempting OTP for:", phoneNumber);
                 showLoading(labels.loadingRecaptcha);
+                
                 try {
                     if (!window.recaptchaVerifier) {
+                        console.log("Initializing Recaptcha...");
                         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 
-                            'size': 'invisible',
-                            'callback': (response) => {
-                                console.log("reCAPTCHA solved");
-                            }
+                            'size': 'invisible'
                         });
                     }
+                    
+                    console.log("Calling signInWithPhoneNumber...");
                     confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+                    console.log("OTP Sent Successfully");
+                    
                     document.getElementById('loading').style.display = 'none';
                     proceedToOtp();
                 } catch (error) {
                     document.getElementById('loading').style.display = 'none';
-                    console.error("Firebase Error:", error);
-                    if (confirm("Firebase error: " + error.message + "\n\nWould you like to enter Demo Mode (123456) instead?")) {
+                    console.error("FIREBASE FAIL:", error);
+                    alert("Firebase Error: " + (error.code || error.message));
+                    
+                    if (confirm("Would you like to use Demo Mode (OTP: 123456) to bypass this error?")) {
                         isFirebaseActive = false;
                         proceedToOtp();
                     }

@@ -391,7 +391,10 @@
             </div>
 
             <div class="footer-links" id="main-footer">
-                Need help? <a href="how-it-works.html">View Guide</a>
+                Need help? <a href="how-it-works.html">View Guide</a><br><br>
+                <div style="opacity: 0.4; font-size: 10px; cursor: pointer;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
+                   ⚠️ Dev Bypass: Force Login to Map
+                </div>
             </div>
 
             <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">
@@ -466,10 +469,11 @@
             }
         };
 
+        let labels = uiLabels['ta-IN'];
         function changeLanguage() {
             const lang = document.getElementById('langSwitch').value;
             localStorage.setItem('preferredLang', lang);
-            const labels = uiLabels[lang];
+            labels = uiLabels[lang];
 
             document.getElementById('tagline').innerText = labels.tagline;
             document.getElementById('tab-phone').innerText = labels.tabPhone;
@@ -587,7 +591,7 @@
             if (isFirebaseActive) {
                 const phoneNumber = "+91" + num;
                 console.log("Attempting OTP for:", phoneNumber);
-                showLoading(labels.loadingRecaptcha);
+                showLoading(labels ? labels.loadingRecaptcha : "Securing...");
                 
                 try {
                     if (!window.recaptchaVerifier) {
@@ -606,9 +610,8 @@
                 } catch (error) {
                     document.getElementById('loading').style.display = 'none';
                     console.error("FIREBASE FAIL:", error);
-                    alert("Firebase Error: " + (error.code || error.message));
                     
-                    if (confirm("Would you like to use Demo Mode (OTP: 123456) to bypass this error?")) {
+                    if (confirm("Firebase error: " + (error.code || error.message) + "\n\nWould you like to enter Demo Mode (123456) instead?")) {
                         isFirebaseActive = false;
                         proceedToOtp();
                     }
@@ -729,8 +732,11 @@
         }
 
         function showLoading(msg) {
-            document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').querySelector('p').innerText = msg;
+            const loading = document.getElementById('loading');
+            if(loading) {
+                loading.style.display = 'flex';
+                loading.querySelector('p').innerText = msg;
+            }
         }
     </script>
     <div id="recaptcha-container"></div>

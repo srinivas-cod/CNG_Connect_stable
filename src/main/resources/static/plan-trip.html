@@ -415,7 +415,11 @@
 
             // Simulate slight delay for "premium" feel
             setTimeout(() => {
-                window.location.href = 'map.html?trigger=route';
+                window.open('map.html?trigger=route', '_blank');
+                // Reset button so user can plan another trip if they want
+                btn.innerHTML = '⚡ Launch Trip Planner';
+                btn.style.opacity = '1';
+                btn.disabled = false;
             }, 800);
         }
 

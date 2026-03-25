@@ -1239,6 +1239,15 @@
       let q = input.value.trim();
       if (!q) return;
 
+      // Check our own database of CNG stations first
+      const queryLower = q.toLowerCase();
+      const matchedStation = stations.find(s => s.name.toLowerCase().includes(queryLower));
+      if (matchedStation) {
+         map.flyTo([matchedStation.lat, matchedStation.lng], 16);
+         input.value = matchedStation.name;
+         return;
+      }
+
       input.disabled = true;
       const originalBtnHtml = searchBtn.innerHTML;
       searchBtn.innerHTML = '<span class="loading-spinner">⌛</span>';

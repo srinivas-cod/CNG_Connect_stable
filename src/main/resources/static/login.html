@@ -285,23 +285,24 @@
             <!-- Email Section -->
             <div id="email-section">
                 <input type="hidden" id="email-mode" value="login">
-                <h3 id="email-title" style="text-align: center; color: white; margin-bottom: 20px;">Sign In</h3>
+                <h3 id="email-title" style="text-align: center; color: #4ade80; font-weight: 800; font-size: 28px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(74, 222, 128, 0.4); text-transform: uppercase;">Sign In</h3>
                 <div class="form-group">
                     <label id="email-label">Email Address</label>
                     <div class="input-wrapper"><input type="email" id="email" placeholder="name@company.com"></div>
                 </div>
                 <div class="form-group">
                     <label id="pass-label">Password</label>
-                    <div class="input-wrapper"><input type="password" id="pass" placeholder="••••••••"></div>
+                    <div class="input-wrapper"><input type="text" id="pass" placeholder="••••••••" style="-webkit-text-security: disc;"></div>
                 </div>
                 <div class="form-group" id="confirm-pass-group" style="display:none">
                     <label id="confirm-pass-label">Confirm Password</label>
-                    <div class="input-wrapper"><input type="password" id="confirm-pass" placeholder="••••••••"></div>
+                    <div class="input-wrapper"><input type="text" id="confirm-pass" placeholder="••••••••" style="-webkit-text-security: disc;"></div>
                 </div>
-                <button class="btn btn-primary" id="email-btn" onclick="emailAction()">Sign In</button>
-                <p style="text-align: center; margin-top: 20px; font-size: 13px; color: #94a3b8;">
+                <button class="btn btn-primary" id="email-btn" onclick="emailAction()" style="font-size: 18px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 18px;">Sign In</button>
+                <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #f8fafc;">
                     <span id="toggle-text">Don't have an account?</span> 
-                    <a href="javascript:void(0)" id="toggle-link" onclick="toggleEmailMode()" style="color: var(--primary); font-weight: 600;">Sign Up</a>
+                    <br><br>
+                    <a href="javascript:void(0)" id="toggle-link" onclick="toggleEmailMode()" style="color: #fbbf24; font-weight: 800; font-size: 22px; text-transform: uppercase; text-decoration: none; text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);">Register</a>
                 </p>
             </div>
 
@@ -309,9 +310,9 @@
             <div id="admin-section" style="display:none">
                 <div class="form-group">
                     <label>Admin Secret Key</label>
-                    <div class="input-wrapper"><input type="password" id="adminPass" placeholder="Enter Master Password"></div>
+                    <div class="input-wrapper"><input type="text" id="adminPass" placeholder="Enter Master Password" style="-webkit-text-security: disc;"></div>
                 </div>
-                <button class="btn btn-primary" onclick="handleAdminAuth()">Authenticate Admin</button>
+                <button class="btn btn-primary" onclick="handleAdminAuth()" style="font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">Authenticate Admin</button>
             </div>
 
             <div class="footer-links">
@@ -331,7 +332,7 @@
                 </div>
             </div>
 
-            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch">Station Manager Login?</div>
+            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch" style="display: block; margin-top: 40px; font-size: 16px; font-weight: 800; color: #f43f5e; cursor: pointer; text-align: center; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5);">Station Manager Login</div>
         </div>
     </div>
 

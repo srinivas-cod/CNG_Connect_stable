@@ -173,8 +173,24 @@
             font-size: 13px;
             color: #64748b;
             margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
 
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .dev-contact {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            width: 100%;
+        }
         .admin-link {
             display: block;
             margin-top: 30px;
@@ -223,7 +239,7 @@
     <div class="login-container">
         <div class="login-card">
             <div class="header">
-                <h1>CNG Connect</h1>
+                <h1>CNG Connect <span style="display: block; font-size: 18px; margin-top: 5px;">| <b style="color: #fbbf24;">Srinivas S</b></span></h1>
                 <p id="tagline">Your premium navigation companion</p>
                 <div style="margin-top: 15px;">
                     <select id="langSwitch" onchange="changeLanguage()" style="background: var(--glass-dark); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 12px;">
@@ -233,13 +249,13 @@
                 </div>
             </div>
 
-            <div class="login-tabs" id="auth-tabs">
-                <div class="tab active" onclick="switchLogin('phone')" id="tab-phone">Phone</div>
-                <div class="tab" onclick="switchLogin('email')" id="tab-email">Email</div>
+            <div class="login-tabs" id="auth-tabs" style="display:none;">
+                <div class="tab" onclick="switchLogin('phone')" id="tab-phone">Phone</div>
+                <div class="tab active" onclick="switchLogin('email')" id="tab-email">Email</div>
             </div>
 
             <!-- Phone Login -->
-            <div id="phone-section">
+            <div id="phone-section" style="display:none;">
                 <div class="form-group" id="phone-input-group">
                     <label id="phone-label">Mobile Number</label>
                     <div class="input-wrapper">
@@ -266,7 +282,7 @@
             </div>
 
             <!-- Email Section -->
-            <div id="email-section" style="display:none">
+            <div id="email-section">
                 <input type="hidden" id="email-mode" value="login">
                 <h3 id="email-title" style="text-align: center; color: white; margin-bottom: 20px;">Sign In</h3>
                 <div class="form-group">
@@ -298,8 +314,18 @@
             </div>
 
             <div class="footer-links">
-                Need help? <a href="how-it-works.html">View Guide</a><br><br>
-                <div style="opacity: 0.3; font-size: 10px; cursor: pointer; text-decoration: underline;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
+                <div>Need help? <a href="how-it-works.html">View Guide</a></div>
+                
+                <div class="dev-contact">
+                    <div style="font-weight: 600; color: #f8fafc; margin-bottom: 5px;">Designed & Developed by <b style="color: #fbbf24;">Srinivas S</b></div>
+                    <div style="display: flex; gap: 15px; flex-direction: column; font-size: 0.85rem;">
+                        <a href="tel:8793380981" style="color: #22c55e;">📞 8793380981</a>
+                        <a href="mailto:srinivassriraman0923@gmail.com" style="color: #3b82f6;">📧 srinivassriraman0923@gmail.com</a>
+                        <span style="color: #94a3b8;">📍 Avadi, Chennai</span>
+                    </div>
+                </div>
+
+                <div style="opacity: 0.3; font-size: 10px; cursor: pointer; text-decoration: underline; margin-top: 10px;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
                     ⚠️ Developer Bypass: Enter Map Directly
                 </div>
             </div>

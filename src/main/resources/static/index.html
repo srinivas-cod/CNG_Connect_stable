@@ -20,7 +20,7 @@
 
 <body>
     <nav class="navbar">
-        <a href="index.html" class="logo">CNG Connect</a>
+        <a href="index.html" class="logo">CNG Connect <span style="margin-left: 10px;">| <b style="color: #fbbf24;">Srinivas S</b></span></a>
         
         <div style="display: flex; align-items: center; gap: 15px;">
             <select id="langSwitch" onchange="changeLanguage()" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border); padding: 5px 12px; border-radius: 12px; font-size: 0.85rem; cursor: pointer; outline: none; backdrop-filter: blur(10px);">
@@ -226,7 +226,7 @@
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-brand">
-                <a href="#" class="logo">CNG Connect</a>
+                <a href="#" class="logo">CNG Connect <span style="margin-left: 10px;">| <b style="color: #fbbf24;">Srinivas S</b></span></a>
                 <p id="footer-bio">Built for the hard-working drivers of Chennai. Navigate smarter, refuel faster.</p>
             </div>
             <div class="footer-nav">
@@ -247,8 +247,22 @@
                 <a href="#" id="link-terms">Terms of Use</a>
             </div>
         </div>
-        <div class="footer-bottom">
-            &copy; 2026 CNG Connect. <span id="rights">All rights reserved.</span> <span id="dev-credit">Designed & Developed by Srinivas</span> 🇮🇳
+        <div class="footer-bottom" style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <div style="font-weight: 600; color: #f8fafc; font-size: 1.1rem; letter-spacing: 0.5px;" id="dev-credit">Designed & Developed by <b style="color: #fbbf24;">Srinivas S</b></div>
+            <div style="display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; font-size: 0.95rem; color: #94a3b8;">
+                <a href="tel:8793380981" style="color: #22c55e; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                   <span>📞</span> 8793380981
+                </a>
+                <a href="mailto:srinivassriraman0923@gmail.com" style="color: #3b82f6; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.3s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                   <span>📧</span> srinivassriraman0923@gmail.com
+                </a>
+                <span style="display: flex; align-items: center; gap: 8px;">
+                   <span>📍</span> Avadi, Chennai
+                </span>
+            </div>
+            <div style="margin-top: 10px; opacity: 0.5; font-size: 0.85rem;">
+                &copy; 2026 CNG Connect. All rights reserved. 🇮🇳
+            </div>
         </div>
     </footer>
 
@@ -321,7 +335,7 @@
                 linkPriv: 'Privacy Policy',
                 linkTerms: 'Terms of Use',
                 rights: 'All rights reserved.',
-                devCredit: 'Designed & Developed by Srinivas'
+                devCredit: 'Designed & Developed by <b style="color: #fbbf24;">Srinivas S</b>'
             },
             'ta-IN': {
                 navHome: 'முகப்பு',
@@ -390,7 +404,7 @@
                 linkPriv: 'தனியுரிமைக் கொள்கை',
                 linkTerms: 'பயன்பாட்டு விதிமுறைகள்',
                 rights: 'அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.',
-                devCredit: 'வடிவமைப்பு மற்றும் மேம்பாடு: ஸ்ரீனிவாஸ்'
+                devCredit: 'வடிவமைப்பு மற்றும் மேம்பாடு: <b style="color: #fbbf24;">ஸ்ரீனிவாஸ் எஸ்</b>'
             }
         };
 

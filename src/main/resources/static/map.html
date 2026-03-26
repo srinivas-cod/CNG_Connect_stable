@@ -72,12 +72,13 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 1000;
+      z-index: 1001;
       display: flex;
-      gap: 15px;
+      gap: 10px;
       width: 95%;
-      max-width: 600px;
+      max-width: 700px;
       transition: all 0.3s ease;
+      pointer-events: auto;
     }
 
     .btn-directions:hover {
@@ -216,6 +217,10 @@
       font-size: 16px;
       outline: none;
       color: var(--dark);
+      pointer-events: auto;
+      cursor: text;
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     /* --- TRIP PLANNER UI (Uber/Ola Style) --- */
@@ -691,9 +696,9 @@
 <body>
   <!-- Professional Floating Sidebar (Search) -->
   <div class="header-controls">
-    <div style="background: var(--glass); display: flex; flex-direction: column; justify-content: center; padding: 8px 15px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow); white-space: nowrap;">
-      <span style="font-size: 0.70rem; color: var(--dark); font-weight: 600; line-height: 1;">Designed & Developed by</span>
-      <b style="color: #fbbf24; font-size: 1.1rem; text-shadow: 0 0 5px rgba(251, 191, 36, 0.5); line-height: 1.2;">Srinivas S</b>
+    <div style="background: var(--glass); display: flex; align-items: center; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow); white-space: nowrap; gap: 5px;">
+      <span style="font-size: 0.65rem; color: var(--dark); font-weight: 600;">by</span>
+      <b style="color: #fbbf24; font-size: 0.85rem; text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);">Srinivas S</b>
     </div>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Enter destination (e.g. Marina Mall)...">
@@ -1465,8 +1470,9 @@
     };
 
     function initUIIsolation() {
-      // Prevent clicks from bubbles through UI to Map
-      const uiContainers = ['.header-controls', '.side-panel', '.map-overlay'];
+      // Prevent clicks from bubbling through UI to Map
+      // NOTE: Do NOT include .header-controls here — it blocks the search input!
+      const uiContainers = ['.side-panel', '.map-overlay'];
       uiContainers.forEach(sel => {
         const el = document.querySelector(sel);
         if (el) {

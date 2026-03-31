@@ -5,370 +5,642 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | CNG Connect</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Sign in to CNG Connect for real-time CNG station status and trip planning.">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: hsl(142, 71%, 45%);
+            --primary-glow: rgba(34, 197, 94, 0.4);
             --secondary: hsl(210, 100%, 50%);
+            --accent: #fbbf24;
             --dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-dark: rgba(255, 255, 255, 0.2);
+            --darker: #020617;
+            --glass: rgba(255, 255, 255, 0.06);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.12);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --google-blue: #4285F4;
+            --google-hover: #3367D6;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Outfit', sans-serif; }
 
         body {
-            background: #020617;
+            background: var(--darker);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
             color: white;
+            overflow-y: auto;
         }
 
-        .bg-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.15), transparent 70%);
+        /* Background Effects */
+        .bg-effects {
+            position: fixed;
+            inset: 0;
             z-index: 0;
+            pointer-events: none;
+        }
+        .bg-effects::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.12), transparent 70%);
+            animation: floatOrb 15s ease-in-out infinite;
+        }
+        .bg-effects::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            right: -15%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.10), transparent 70%);
+            animation: floatOrb 18s ease-in-out infinite reverse;
+        }
+        @keyframes floatOrb {
+            0%, 100% { transform: translate(0, 0); }
+            33% { transform: translate(50px, -40px); }
+            66% { transform: translate(-30px, 30px); }
         }
 
+        /* Login Container */
         .login-container {
-            width: 90%;
-            max-width: 420px;
+            width: 95%;
+            max-width: 440px;
             z-index: 10;
+            padding: 20px 0;
         }
 
         .login-card {
             background: var(--glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px;
-            border-radius: 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            padding: 40px 36px;
+            border-radius: 28px;
+            box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: cardSlideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes cardSlideIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
+        /* Header */
+        .header { text-align: center; margin-bottom: 32px; }
         .header h1 {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
-            background: linear-gradient(to right, #4ade80, #3b82f6);
+            background: linear-gradient(135deg, #4ade80, #22d3ee, #3b82f6);
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
+            animation: gradientShift 4s ease infinite;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .header .dev-tag {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            font-weight: 500;
+            margin-top: 6px;
+        }
+        .header .dev-tag b {
+            color: var(--accent);
+            font-size: 1.05rem;
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+        }
+        .header .tagline {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
         }
 
+        /* Language Switch */
+        .lang-row {
+            display: flex;
+            justify-content: center;
+            margin-top: 12px;
+        }
+        .lang-row select {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border: 1px solid var(--glass-border);
+            padding: 5px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            outline: none;
+            transition: 0.3s;
+        }
+        .lang-row select:hover { background: rgba(255,255,255,0.12); }
+
+        /* Tabs */
         .login-tabs {
             display: flex;
-            background: var(--glass-dark);
-            padding: 5px;
-            border-radius: 15px;
-            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 4px;
+            border-radius: 14px;
+            margin-bottom: 28px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
         .tab {
             flex: 1;
-            padding: 10px;
+            padding: 11px 0;
             text-align: center;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 12px;
-            transition: all 0.3s;
-            color: #94a3b8;
+            border-radius: 11px;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+            position: relative;
         }
-
+        .tab:hover:not(.active) { color: var(--text-secondary); }
         .tab.active {
-            background: white;
-            color: var(--dark);
+            background: linear-gradient(135deg, var(--primary), hsl(142, 71%, 38%));
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        /* Form Elements */
+        .form-group { margin-bottom: 18px; }
         .form-group label {
             display: block;
             font-size: 12px;
-            color: #94a3b8;
-            margin-bottom: 8px;
+            color: var(--text-secondary);
+            margin-bottom: 7px;
             text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
         }
-
         .input-wrapper {
             display: flex;
             align-items: center;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            padding: 5px 15px;
+            padding: 4px 14px;
+            transition: all 0.3s;
         }
-
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        }
+        .input-wrapper .icon { font-size: 16px; margin-right: 10px; opacity: 0.5; }
         .input-wrapper input {
             background: transparent;
             border: none;
             color: white;
-            padding: 10px;
+            padding: 12px 6px;
             width: 100%;
             outline: none;
-            font-size: 16px;
+            font-size: 15px;
+        }
+        .input-wrapper input::placeholder { color: var(--text-muted); font-size: 14px; }
+        .input-wrapper .toggle-pass {
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            opacity: 0.5;
+            transition: 0.3s;
+            user-select: none;
+        }
+        .input-wrapper .toggle-pass:hover { opacity: 0.9; }
+
+        /* Password Strength */
+        .password-strength {
+            height: 3px;
+            border-radius: 2px;
+            margin-top: 8px;
+            background: rgba(255,255,255,0.05);
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .password-strength .bar {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.4s ease, background 0.4s ease;
+            width: 0%;
         }
 
+        /* Buttons */
         .btn {
             width: 100%;
-            padding: 15px;
+            padding: 14px;
             border: none;
             border-radius: 12px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
         }
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+        .btn:hover::after { transform: translateX(100%); }
 
         .btn-primary {
-            background: var(--primary);
+            background: linear-gradient(135deg, var(--primary), hsl(142, 71%, 38%));
             color: white;
-            box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.4);
+            box-shadow: 0 8px 20px -4px var(--primary-glow);
         }
-
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(34, 197, 94, 0.5);
+            box-shadow: 0 12px 28px -4px var(--primary-glow);
         }
+        .btn-primary:active { transform: translateY(0); }
 
-        .otp-inputs {
+        /* Google Button */
+        .btn-google {
+            background: white;
+            color: #3c4043;
+            font-weight: 600;
             display: flex;
-            gap: 8px;
+            align-items: center;
             justify-content: center;
-            margin-top: 15px;
+            gap: 12px;
+            padding: 13px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .btn-google:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+        .btn-google:active { transform: translateY(0); }
+        .btn-google svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 22px 0;
+            gap: 14px;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
         }
 
-        .otp-box {
-            width: 42px;
-            height: 48px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+        /* Forgot Password */
+        .forgot-link {
+            display: block;
+            text-align: right;
+            font-size: 12px;
+            color: var(--primary);
+            text-decoration: none;
+            margin-top: -8px;
+            margin-bottom: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .forgot-link:hover { color: #4ade80; text-decoration: underline; }
+
+        /* Toggle Auth Text */
+        .toggle-auth {
             text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            outline: none;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
         }
+        .toggle-auth a {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .toggle-auth a:hover { text-shadow: 0 0 12px rgba(251, 191, 36, 0.5); }
 
+        /* Footer Links */
         .footer-links {
             text-align: center;
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 24px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             align-items: center;
         }
-
-        .footer-links a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-        }
+        .footer-links a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .footer-links a:hover { text-decoration: underline; }
 
         .dev-contact {
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 14px;
+            padding-top: 14px;
             border-top: 1px solid rgba(255,255,255,0.05);
             width: 100%;
         }
+        .dev-contact .dev-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+        }
+        .dev-contact .dev-name b { color: var(--accent); }
+        .dev-contact .dev-links {
+            display: flex;
+            gap: 14px;
+            flex-direction: column;
+            font-size: 0.8rem;
+        }
+        .dev-contact .dev-links a {
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .dev-contact .dev-links a:hover { opacity: 0.8; }
+
+        /* Admin Link */
         .admin-link {
             display: block;
-            margin-top: 30px;
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.3);
+            margin-top: 28px;
+            font-size: 13px;
+            font-weight: 700;
+            color: rgba(244, 63, 94, 0.7);
             cursor: pointer;
             text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
         }
+        .admin-link:hover { color: #f43f5e; text-shadow: 0 0 10px rgba(244, 63, 94, 0.4); }
 
+        /* Loading Overlay */
         #loading {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(2, 6, 23, 0.92);
+            backdrop-filter: blur(8px);
             z-index: 100;
             justify-content: center;
             align-items: center;
             flex-direction: column;
         }
-
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(34, 197, 94, 0.1);
+            width: 48px; height: 48px;
+            border: 3px solid rgba(34, 197, 94, 0.1);
             border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 1s infinite linear;
+            animation: spin 0.8s infinite linear;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #loading p {
+            margin-top: 16px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 14px;
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: white;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 360px;
+        }
+        .toast.success { background: rgba(34, 197, 94, 0.9); }
+        .toast.error { background: rgba(239, 68, 68, 0.9); }
+        .toast.info { background: rgba(59, 130, 246, 0.9); }
+        .toast.removing { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(60px) scale(0.9); } to { opacity: 1; transform: translateX(0) scale(1); } }
+        @keyframes toastOut { to { opacity: 0; transform: translateX(60px) scale(0.9); } }
+
+        /* Error display inline */
+        .field-error {
+            font-size: 11px;
+            color: var(--danger);
+            margin-top: 5px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card { padding: 30px 24px; border-radius: 22px; }
+            .header h1 { font-size: 26px; }
         }
     </style>
 </head>
 
 <body>
-    <div class="bg-overlay"></div>
-    <div id="recaptcha-container"></div>
+    <div class="bg-effects"></div>
+    <div class="toast-container" id="toast-container"></div>
 
     <div id="loading">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; font-weight: 600;">Securing Connection...</p>
+        <p>Securing Connection...</p>
     </div>
 
     <div class="login-container">
         <div class="login-card">
+            <!-- Header -->
             <div class="header">
                 <h1>CNG Connect</h1>
-                <div style="font-size: 1rem; color: #cbd5e1; font-weight: 500; margin-top: 5px; margin-bottom: 5px;">Designed & Developed by <b style="color: #fbbf24; font-size: 1.3rem; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">Srinivas S</b></div>
-                <p id="tagline">Your premium navigation companion</p>
-                <div style="margin-top: 15px;">
-                    <select id="langSwitch" onchange="changeLanguage()" style="background: var(--glass-dark); color: white; border: none; padding: 5px 10px; border-radius: 8px; font-size: 12px;">
+                <div class="dev-tag">Designed & Developed by <b>Srinivas S</b></div>
+                <p class="tagline" id="tagline">Your premium navigation companion</p>
+                <div class="lang-row">
+                    <select id="langSwitch" onchange="changeLanguage()">
                         <option value="en-US">English</option>
                         <option value="ta-IN">தமிழ்</option>
                     </select>
                 </div>
             </div>
 
-            <div class="login-tabs" id="auth-tabs" style="display:none;">
-                <div class="tab" onclick="switchLogin('phone')" id="tab-phone">Phone</div>
-                <div class="tab active" onclick="switchLogin('email')" id="tab-email">Email</div>
+            <!-- Auth Tabs -->
+            <div class="login-tabs" id="auth-tabs">
+                <div class="tab active" onclick="switchTab('signin')" id="tab-signin">Sign In</div>
+                <div class="tab" onclick="switchTab('signup')" id="tab-signup">Sign Up</div>
             </div>
 
-            <!-- Phone Login -->
-            <div id="phone-section" style="display:none;">
-                <div class="form-group" id="phone-input-group">
-                    <label id="phone-label">Mobile Number</label>
+            <!-- ========== SIGN IN SECTION ========== -->
+            <div id="signin-section">
+                <div class="form-group">
+                    <label id="signin-email-label">Email Address</label>
                     <div class="input-wrapper">
-                        <span style="color: #64748b; font-weight: 600; margin-right: 10px;">+91</span>
-                        <input type="text" id="p-number" placeholder="Enter 10-digit number" />
+                        <span class="icon">📧</span>
+                        <input type="email" id="signin-email" placeholder="name@company.com" autocomplete="email">
                     </div>
+                    <div class="field-error" id="signin-email-error"></div>
                 </div>
-
-                <div id="otp-section" style="display:none">
-                    <label style="display:block; font-size: 12px; color: #94a3b8; text-transform: uppercase;">Enter OTP</label>
-                    <div class="otp-inputs">
-                        <input type="text" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp2')" id="otp1">
-                        <input type="text" id="otp2" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp3')">
-                        <input type="text" id="otp3" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp4')">
-                        <input type="text" id="otp4" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp5')">
-                        <input type="text" id="otp5" class="otp-box" maxlength="1" onkeyup="moveNext(this, 'otp6')">
-                        <input type="text" id="otp6" class="otp-box" maxlength="1">
+                <div class="form-group">
+                    <label id="signin-pass-label">Password</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="signin-pass" placeholder="Enter your password" autocomplete="current-password">
+                        <span class="toggle-pass" onclick="togglePassword('signin-pass', this)">👁️</span>
                     </div>
-                    <p style="text-align: center; margin-top: 15px; font-size: 12px; color: #64748b;">OTP expires in <span id="timer">01:59</span></p>
-                    <button class="btn btn-primary" style="margin-top: 25px;" onclick="verifyOtp()">Verify & Continue</button>
+                    <div class="field-error" id="signin-pass-error"></div>
                 </div>
+                <a class="forgot-link" id="forgot-link" onclick="handleForgotPassword()">Forgot password?</a>
+                <button class="btn btn-primary" id="signin-btn" onclick="handleSignIn()">Sign In</button>
 
-                <button class="btn btn-primary" id="send-otp-btn" onclick="sendOtp()">Send One-Time Password</button>
+                <div class="divider"><span id="divider-signin">or continue with</span></div>
+                <button class="btn-google" id="google-signin-btn" onclick="handleGoogleAuth()">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    <span id="google-signin-text">Continue with Google</span>
+                </button>
             </div>
 
-            <!-- Email Section -->
-            <div id="email-section">
-                <input type="hidden" id="email-mode" value="login">
-                <h3 id="email-title" style="text-align: center; color: #4ade80; font-weight: 800; font-size: 28px; margin-bottom: 25px; text-shadow: 0 0 15px rgba(74, 222, 128, 0.4); text-transform: uppercase;">Sign In</h3>
+            <!-- ========== SIGN UP SECTION ========== -->
+            <div id="signup-section" style="display: none;">
+                <!-- Google Sign Up (Primary) -->
+                <button class="btn-google" id="google-signup-btn" onclick="handleGoogleAuth()" style="margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
+                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    </svg>
+                    <span id="google-signup-text">Sign up with Google</span>
+                </button>
+                <p style="text-align: center; font-size: 11px; color: var(--text-muted); margin-bottom: 4px;" id="google-hint">Recommended — fastest way to get started</p>
+
+                <div class="divider"><span id="divider-signup">or register with email</span></div>
+
+                <!-- Email Sign Up -->
                 <div class="form-group">
-                    <label id="email-label">Email Address</label>
-                    <div class="input-wrapper"><input type="email" id="email" placeholder="name@company.com"></div>
+                    <label id="signup-name-label">Full Name</label>
+                    <div class="input-wrapper">
+                        <span class="icon">👤</span>
+                        <input type="text" id="signup-name" placeholder="Enter your full name" autocomplete="name">
+                    </div>
+                    <div class="field-error" id="signup-name-error"></div>
                 </div>
                 <div class="form-group">
-                    <label id="pass-label">Password</label>
-                    <div class="input-wrapper"><input type="text" id="pass" placeholder="••••••••" style="-webkit-text-security: disc;"></div>
+                    <label id="signup-email-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <span class="icon">📧</span>
+                        <input type="email" id="signup-email" placeholder="name@company.com" autocomplete="email">
+                    </div>
+                    <div class="field-error" id="signup-email-error"></div>
                 </div>
-                <div class="form-group" id="confirm-pass-group" style="display:none">
-                    <label id="confirm-pass-label">Confirm Password</label>
-                    <div class="input-wrapper"><input type="text" id="confirm-pass" placeholder="••••••••" style="-webkit-text-security: disc;"></div>
+                <div class="form-group">
+                    <label id="signup-pass-label">Password</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="signup-pass" placeholder="Min 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value)">
+                        <span class="toggle-pass" onclick="togglePassword('signup-pass', this)">👁️</span>
+                    </div>
+                    <div class="password-strength"><div class="bar" id="pass-strength-bar"></div></div>
+                    <div class="field-error" id="signup-pass-error"></div>
                 </div>
-                <button class="btn btn-primary" id="email-btn" onclick="emailAction()" style="font-size: 18px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 18px;">Sign In</button>
-                <p style="text-align: center; margin-top: 30px; font-size: 14px; color: #f8fafc;">
-                    <span id="toggle-text">Don't have an account?</span> 
-                    <br><br>
-                    <a href="javascript:void(0)" id="toggle-link" onclick="toggleEmailMode()" style="color: #fbbf24; font-weight: 800; font-size: 22px; text-transform: uppercase; text-decoration: none; text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);">Register</a>
-                </p>
+                <div class="form-group">
+                    <label id="signup-confirm-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="signup-confirm" placeholder="Re-enter password" autocomplete="new-password">
+                    </div>
+                    <div class="field-error" id="signup-confirm-error"></div>
+                </div>
+                <button class="btn btn-primary" id="signup-btn" onclick="handleSignUp()">Create Account</button>
             </div>
 
-            <!-- Admin Login -->
-            <div id="admin-section" style="display:none">
-                <div class="form-group">
-                    <label>Admin Secret Key</label>
-                    <div class="input-wrapper"><input type="text" id="adminPass" placeholder="Enter Master Password" style="-webkit-text-security: disc;"></div>
+            <!-- ========== ADMIN SECTION ========== -->
+            <div id="admin-section" style="display: none;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 40px;">🛡️</span>
+                    <h3 style="color: #f43f5e; margin-top: 8px; font-size: 18px;" id="admin-title">Station Manager Access</h3>
                 </div>
-                <button class="btn btn-primary" onclick="handleAdminAuth()" style="font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;">Authenticate Admin</button>
+                <div class="form-group">
+                    <label id="admin-key-label">Admin Secret Key</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔑</span>
+                        <input type="password" id="adminPass" placeholder="Enter Master Password" autocomplete="off">
+                        <span class="toggle-pass" onclick="togglePassword('adminPass', this)">👁️</span>
+                    </div>
+                    <div class="field-error" id="admin-error"></div>
+                </div>
+                <button class="btn btn-primary" onclick="handleAdminAuth()" id="admin-btn" style="background: linear-gradient(135deg, #f43f5e, #e11d48);">Authenticate Admin</button>
+            </div>
+
+            <!-- Toggle Auth / Footer -->
+            <div class="toggle-auth" id="toggle-auth-area">
+                <span id="toggle-text">Don't have an account?</span>
+                <br><br>
+                <a href="javascript:void(0)" id="toggle-link" onclick="toggleAuthMode()">Sign Up</a>
             </div>
 
             <div class="footer-links">
                 <div>Need help? <a href="how-it-works.html">View Guide</a></div>
-                
                 <div class="dev-contact">
-                    <div style="font-weight: 600; color: #f8fafc; margin-bottom: 5px;">Designed & Developed by <b style="color: #fbbf24;">Srinivas S</b></div>
-                    <div style="display: flex; gap: 15px; flex-direction: column; font-size: 0.85rem;">
+                    <div class="dev-name">Designed & Developed by <b>Srinivas S</b></div>
+                    <div class="dev-links">
                         <a href="tel:8793380981" style="color: #22c55e;">📞 8793380981</a>
                         <a href="mailto:srinivassriraman0923@gmail.com" style="color: #3b82f6;">📧 srinivassriraman0923@gmail.com</a>
-                        <span style="color: #94a3b8;">📍 Avadi, Chennai</span>
+                        <span style="color: var(--text-secondary);">📍 Avadi, Chennai</span>
                     </div>
-                </div>
-
-                <div style="opacity: 0.3; font-size: 10px; cursor: pointer; text-decoration: underline; margin-top: 10px;" onclick="localStorage.setItem('userRole', 'USER'); window.location.href='map.html'">
-                    ⚠️ Developer Bypass: Enter Map Directly
                 </div>
             </div>
 
-            <div class="admin-link" onclick="switchLogin('admin')" id="adminSwitch" style="display: block; margin-top: 40px; font-size: 16px; font-weight: 800; color: #f43f5e; cursor: pointer; text-align: center; text-transform: uppercase; letter-spacing: 1px; text-shadow: 0 0 10px rgba(244, 63, 94, 0.5);">Station Manager Login</div>
+            <div class="admin-link" onclick="switchTab('admin')" id="adminSwitch">Station Manager Login</div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (compat v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
     <script>
-        const uiLabels = {
-            'en-US': {
-                tagline: 'Your premium navigation companion',
-                tabPhone: 'Phone', tabEmail: 'Email', phoneLabel: 'Mobile Number', pPlaceholder: 'Enter 10-digit number',
-                otpWait: 'OTP expires in', otpBtn: 'Send One-Time Password', otpVerify: 'Verify & Continue',
-                otpLabel: 'Enter OTP', emailLabel: 'Email Address', passLabel: 'Password', confirmLabel: 'Confirm Password',
-                eSignIn: 'Sign In', eSignUp: 'Sign Up', eNoAcc: "Don't have an account?", eHasAcc: 'Already have an account?',
-                eTitleIn: 'Sign In to CNG Connect', eTitleUp: 'Create New Account', adminLink: 'Station Manager Login?',
-                adminBack: 'Back to Driver Login', adminKey: 'Admin Secret Key', adminBtn: 'Authenticate Admin',
-                loadingSecuring: 'Securing Connection...', loadingRecaptcha: 'Securing reCAPTCHA...',
-                loadingVerify: 'Verifying Account...', loadingAuth: 'Authenticating...', loadingCreate: 'Creating Account...',
-                loadingAdmin: 'Granting Admin Rights...'
-            },
-            'ta-IN': {
-                tagline: 'உங்கள் பிரீமியம் வழிசெலுத்தல் துணையாக',
-                tabPhone: 'தொலைபேசி', tabEmail: 'மின்னஞ்சல்', phoneLabel: 'கைபேசி எண்', pPlaceholder: '10 இலக்க எண்ணை உள்ளிடவும்',
-                otpWait: 'OTP காலாவதி ஆகுது', otpBtn: 'ஒரு முறை கடவுச்சொல்லை அனுப்பு', otpVerify: 'சரிபார்த்து தொடரவும்',
-                otpLabel: 'OTP ஐ உள்ளிடவும்', emailLabel: 'மின்னஞ்சல் முகவரி', passLabel: 'கடவுச்சொல்', confirmLabel: 'கடவுச்சொல்லை உறுதியளிக்கவும்',
-                eSignIn: 'உள்நுழைக', eSignUp: 'பதிவு செய்க', eNoAcc: "கணக்கு இல்லையா?", eHasAcc: 'ஏற்கனவே கணக்கு உள்ளதா?',
-                eTitleIn: 'மின்னஞ்சல் மூலம் உள்நுழைக', eTitleUp: 'புதிய கணக்கை உருவாக்கு', adminLink: 'நிலைய மேலாளர் உள்நுழைவு?',
-                adminBack: 'மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு', adminKey: 'நிர்வாகி ரகசிய சாவி', adminBtn: 'நிர்வாகியை அங்கீகரி',
-                loadingSecuring: 'இணைப்பு பாதுகாக்கப்படுகிறது...', loadingRecaptcha: 'reCAPTCHA பாதுகாக்கப்படுகிறது...',
-                loadingVerify: 'கணக்கு சரிபார்க்கப்படுகிறது...', loadingAuth: 'அங்கீகரிக்கப்படுகிறது...', loadingCreate: 'கணக்கு உருவாக்கப்படுகிறது...',
-                loadingAdmin: 'அட்மின் அதிகாரத்தை வழங்குகிறது...'
-            }
-        };
-
-        let labels = uiLabels['ta-IN'];
+        // ====================== CONFIG ======================
         const firebaseConfig = {
             apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
             authDomain: "cng--connect.firebaseapp.com",
@@ -377,186 +649,440 @@
             messagingSenderId: "972459633108",
             appId: "1:972459633108:web:d73c4a2931f1ac7adbce41"
         };
-
         firebase.initializeApp(firebaseConfig);
-        let confirmationResult = null;
-        let isFirebaseActive = true;
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+        // Add scopes for richer profile info
+        googleProvider.addScope('email');
+        googleProvider.addScope('profile');
 
+        // ====================== i18n ======================
+        const uiLabels = {
+            'en-US': {
+                tagline: 'Your premium navigation companion',
+                tabSignIn: 'Sign In', tabSignUp: 'Sign Up',
+                signinEmailLabel: 'Email Address', signinPassLabel: 'Password',
+                forgotLink: 'Forgot password?',
+                signinBtn: 'Sign In',
+                dividerSignin: 'or continue with',
+                googleSigninText: 'Continue with Google',
+                googleSignupText: 'Sign up with Google',
+                googleHint: 'Recommended — fastest way to get started',
+                dividerSignup: 'or register with email',
+                signupNameLabel: 'Full Name', signupEmailLabel: 'Email Address',
+                signupPassLabel: 'Password', signupConfirmLabel: 'Confirm Password',
+                signupBtn: 'Create Account',
+                toggleNoAcc: "Don't have an account?", toggleHasAcc: "Already have an account?",
+                toggleToSignup: 'Sign Up', toggleToSignin: 'Sign In',
+                adminTitle: 'Station Manager Access', adminKeyLabel: 'Admin Secret Key',
+                adminBtn: 'Authenticate Admin', adminLink: 'Station Manager Login',
+                adminBack: '← Back to Driver Login',
+                loadingSecuring: 'Securing Connection...', loadingAuth: 'Authenticating...',
+                loadingCreate: 'Creating Account...', loadingGoogle: 'Connecting to Google...',
+                loadingAdmin: 'Granting Admin Rights...', loadingReset: 'Sending Reset Email...',
+                toastLoginSuccess: 'Welcome back!', toastSignupSuccess: 'Account created successfully!',
+                toastGoogleSuccess: 'Google sign-in successful!', toastAdminSuccess: 'Admin access granted!',
+                toastResetSent: 'Password reset email sent! Check your inbox.',
+                errEmailRequired: 'Email is required', errEmailInvalid: 'Enter a valid email address',
+                errPassRequired: 'Password is required', errPassShort: 'Password must be at least 6 characters',
+                errNameRequired: 'Name is required', errConfirmRequired: 'Confirm your password',
+                errPassMismatch: 'Passwords do not match', errAdminInvalid: 'Invalid Admin Key'
+            },
+            'ta-IN': {
+                tagline: 'உங்கள் பிரீமியம் வழிசெலுத்தல் துணையாக',
+                tabSignIn: 'உள்நுழைக', tabSignUp: 'பதிவு செய்க',
+                signinEmailLabel: 'மின்னஞ்சல் முகவரி', signinPassLabel: 'கடவுச்சொல்',
+                forgotLink: 'கடவுச்சொல் மறந்துவிட்டதா?',
+                signinBtn: 'உள்நுழைக',
+                dividerSignin: 'அல்லது இதன் மூலம் தொடரவும்',
+                googleSigninText: 'Google மூலம் தொடரவும்',
+                googleSignupText: 'Google மூலம் பதிவு செய்யவும்',
+                googleHint: 'பரிந்துரைக்கப்படுகிறது — விரைவான வழி',
+                dividerSignup: 'அல்லது மின்னஞ்சல் மூலம் பதிவு',
+                signupNameLabel: 'முழு பெயர்', signupEmailLabel: 'மின்னஞ்சல் முகவரி',
+                signupPassLabel: 'கடவுச்சொல்', signupConfirmLabel: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+                signupBtn: 'கணக்கை உருவாக்கு',
+                toggleNoAcc: 'கணக்கு இல்லையா?', toggleHasAcc: 'ஏற்கனவே கணக்கு உள்ளதா?',
+                toggleToSignup: 'பதிவு செய்க', toggleToSignin: 'உள்நுழைக',
+                adminTitle: 'நிலைய மேலாளர் அணுகல்', adminKeyLabel: 'நிர்வாகி ரகசிய சாவி',
+                adminBtn: 'நிர்வாகியை அங்கீகரி', adminLink: 'நிலைய மேலாளர் உள்நுழைவு',
+                adminBack: '← மீண்டும் ஓட்டுநர் உள்நுழைவுக்கு',
+                loadingSecuring: 'இணைப்பு பாதுகாக்கப்படுகிறது...', loadingAuth: 'அங்கீகரிக்கப்படுகிறது...',
+                loadingCreate: 'கணக்கு உருவாக்கப்படுகிறது...', loadingGoogle: 'Google உடன் இணைக்கிறது...',
+                loadingAdmin: 'அட்மின் அதிகாரத்தை வழங்குகிறது...', loadingReset: 'மீட்டமைப்பு மின்னஞ்சல் அனுப்புகிறது...',
+                toastLoginSuccess: 'மீண்டும் வரவேற்கிறோம்!', toastSignupSuccess: 'கணக்கு வெற்றிகரமாக உருவாக்கப்பட்டது!',
+                toastGoogleSuccess: 'Google உள்நுழைவு வெற்றி!', toastAdminSuccess: 'அட்மின் அணுகல் வழங்கப்பட்டது!',
+                toastResetSent: 'கடவுச்சொல் மீட்டமைப்பு மின்னஞ்சல் அனுப்பப்பட்டது!',
+                errEmailRequired: 'மின்னஞ்சல் தேவை', errEmailInvalid: 'சரியான மின்னஞ்சலை உள்ளிடவும்',
+                errPassRequired: 'கடவுச்சொல் தேவை', errPassShort: 'கடவுச்சொல் குறைந்தது 6 எழுத்துகள்',
+                errNameRequired: 'பெயர் தேவை', errConfirmRequired: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
+                errPassMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை', errAdminInvalid: 'தவறான நிர்வாகி சாவி'
+            }
+        };
+
+        let currentLang = 'en-US';
+        let L = uiLabels['en-US'];
+
+        // ====================== LANGUAGE ======================
         function changeLanguage() {
-            const lang = document.getElementById('langSwitch').value;
-            localStorage.setItem('preferredLang', lang);
-            labels = uiLabels[lang];
-            
-            document.getElementById('tagline').innerText = labels.tagline;
-            document.getElementById('tab-phone').innerText = labels.tabPhone;
-            document.getElementById('tab-email').innerText = labels.tabEmail;
-            document.getElementById('phone-label').innerText = labels.phoneLabel;
-            document.getElementById('p-number').placeholder = labels.pPlaceholder;
-            document.getElementById('send-otp-btn').innerText = labels.otpBtn;
-            document.getElementById('email-label').innerText = labels.emailLabel;
-            document.getElementById('pass-label').innerText = labels.passLabel;
-            document.getElementById('confirm-pass-label').innerText = labels.confirmLabel;
-            document.getElementById('adminPass').placeholder = labels.adminBtn;
-            document.querySelector('#admin-section label').innerText = labels.adminKey;
-            document.querySelector('#admin-section button').innerText = labels.adminBtn;
-            document.querySelector('#otp-section label').innerText = labels.otpLabel;
-            document.querySelector('#otp-section button').innerText = labels.otpVerify;
-            
-            const adminLink = document.getElementById('adminSwitch');
-            if (adminLink.innerText.includes('Login') || adminLink.innerText.includes('உள்நுழைவு')) {
-                adminLink.innerText = labels.adminLink;
-            } else {
-                adminLink.innerText = labels.adminBack;
-            }
-            updateEmailModeText();
+            currentLang = document.getElementById('langSwitch').value;
+            localStorage.setItem('preferredLang', currentLang);
+            L = uiLabels[currentLang];
+
+            document.getElementById('tagline').innerText = L.tagline;
+            document.getElementById('tab-signin').innerText = L.tabSignIn;
+            document.getElementById('tab-signup').innerText = L.tabSignUp;
+            document.getElementById('signin-email-label').innerText = L.signinEmailLabel;
+            document.getElementById('signin-pass-label').innerText = L.signinPassLabel;
+            document.getElementById('forgot-link').innerText = L.forgotLink;
+            document.getElementById('signin-btn').innerText = L.signinBtn;
+            document.getElementById('divider-signin').innerText = L.dividerSignin;
+            document.getElementById('google-signin-text').innerText = L.googleSigninText;
+            document.getElementById('google-signup-text').innerText = L.googleSignupText;
+            document.getElementById('google-hint').innerText = L.googleHint;
+            document.getElementById('divider-signup').innerText = L.dividerSignup;
+            document.getElementById('signup-name-label').innerText = L.signupNameLabel;
+            document.getElementById('signup-email-label').innerText = L.signupEmailLabel;
+            document.getElementById('signup-pass-label').innerText = L.signupPassLabel;
+            document.getElementById('signup-confirm-label').innerText = L.signupConfirmLabel;
+            document.getElementById('signup-btn').innerText = L.signupBtn;
+            document.getElementById('admin-title').innerText = L.adminTitle;
+            document.getElementById('admin-key-label').innerText = L.adminKeyLabel;
+            document.getElementById('admin-btn').innerText = L.adminBtn;
+
+            // Update toggle text based on current mode
+            updateToggleText();
+            updateAdminLinkText();
         }
 
-        function updateEmailModeText() {
-            const lang = document.getElementById('langSwitch').value;
-            const l = uiLabels[lang];
-            const mode = document.getElementById('email-mode').value;
-            if (mode === 'signup') {
-                document.getElementById('email-title').innerText = l.eTitleUp;
-                document.getElementById('email-btn').innerText = l.eSignUp;
-                document.getElementById('toggle-text').innerText = l.eHasAcc;
-                document.getElementById('toggle-link').innerText = l.eSignIn;
+        let currentMode = 'signin'; // 'signin', 'signup', 'admin'
+
+        function updateToggleText() {
+            if (currentMode === 'signin') {
+                document.getElementById('toggle-text').innerText = L.toggleNoAcc;
+                document.getElementById('toggle-link').innerText = L.toggleToSignup;
             } else {
-                document.getElementById('email-title').innerText = l.eTitleIn;
-                document.getElementById('email-btn').innerText = l.eSignIn;
-                document.getElementById('toggle-text').innerText = l.eNoAcc;
-                document.getElementById('toggle-link').innerText = l.eSignUp;
+                document.getElementById('toggle-text').innerText = L.toggleHasAcc;
+                document.getElementById('toggle-link').innerText = L.toggleToSignin;
             }
         }
 
-        function switchLogin(type) {
-            const tabs = document.querySelectorAll('.tab');
-            const p = document.getElementById('phone-section');
-            const e = document.getElementById('email-section');
-            const a = document.getElementById('admin-section');
+        function updateAdminLinkText() {
+            const link = document.getElementById('adminSwitch');
+            if (currentMode === 'admin') {
+                link.innerText = L.adminBack;
+            } else {
+                link.innerText = L.adminLink;
+            }
+        }
+
+        // ====================== TAB SWITCHING ======================
+        function switchTab(tab) {
+            currentMode = tab;
+            const signinSection = document.getElementById('signin-section');
+            const signupSection = document.getElementById('signup-section');
+            const adminSection = document.getElementById('admin-section');
             const authTabs = document.getElementById('auth-tabs');
-            const adminSwitch = document.getElementById('adminSwitch');
+            const toggleArea = document.getElementById('toggle-auth-area');
+            const tabSignin = document.getElementById('tab-signin');
+            const tabSignup = document.getElementById('tab-signup');
 
-            p.style.display = 'none'; e.style.display = 'none'; a.style.display = 'none';
-            authTabs.style.display = 'flex'; adminSwitch.style.display = 'block';
-            tabs.forEach(t => t.classList.remove('active'));
+            // Reset
+            signinSection.style.display = 'none';
+            signupSection.style.display = 'none';
+            adminSection.style.display = 'none';
+            tabSignin.classList.remove('active');
+            tabSignup.classList.remove('active');
+            clearAllErrors();
 
-            if (type === 'phone') { p.style.display = 'block'; tabs[0].classList.add('active'); }
-            else if (type === 'email') { e.style.display = 'block'; tabs[1].classList.add('active'); }
-            else { a.style.display = 'block'; authTabs.style.display = 'none'; adminSwitch.innerText = labels.adminBack; }
-        }
-
-        async function sendOtp() {
-            const num = document.getElementById('p-number').value;
-            if (num.length !== 10) return alert("Please enter a valid 10-digit number");
-
-            showLoading(labels.loadingRecaptcha);
-            try {
-                if (!window.recaptchaVerifier) {
-                    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
-                }
-                const phoneNumber = "+91" + num;
-                confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
-                hideLoading();
-                proceedToOtp();
-            } catch (error) {
-                hideLoading();
-                console.error(error);
-                if (confirm("Firebase error: " + error.message + "\n\nUse Demo Mode (OTP: 123456)?")) {
-                    isFirebaseActive = false;
-                    proceedToOtp();
-                }
+            if (tab === 'signin') {
+                signinSection.style.display = 'block';
+                tabSignin.classList.add('active');
+                authTabs.style.display = 'flex';
+                toggleArea.style.display = 'block';
+            } else if (tab === 'signup') {
+                signupSection.style.display = 'block';
+                tabSignup.classList.add('active');
+                authTabs.style.display = 'flex';
+                toggleArea.style.display = 'block';
+            } else if (tab === 'admin') {
+                adminSection.style.display = 'block';
+                authTabs.style.display = 'none';
+                toggleArea.style.display = 'none';
             }
+
+            updateToggleText();
+            updateAdminLinkText();
         }
 
-        function proceedToOtp() {
-            document.getElementById('phone-input-group').style.display = 'none';
-            document.getElementById('send-otp-btn').style.display = 'none';
-            document.getElementById('otp-section').style.display = 'block';
-            startTimer();
+        function toggleAuthMode() {
+            if (currentMode === 'signin') switchTab('signup');
+            else switchTab('signin');
         }
 
-        function startTimer() {
-            let duration = 119;
-            const display = document.getElementById('timer');
-            const interval = setInterval(() => {
-                let m = parseInt(duration / 60, 10);
-                let s = parseInt(duration % 60, 10);
-                display.textContent = (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
-                if (--duration < 0) clearInterval(interval);
-            }, 1000);
+        // ====================== VALIDATION ======================
+        function showFieldError(id, msg) {
+            const el = document.getElementById(id);
+            el.style.display = 'block';
+            el.innerText = msg;
+        }
+        function clearFieldError(id) {
+            const el = document.getElementById(id);
+            if (el) { el.style.display = 'none'; el.innerText = ''; }
+        }
+        function clearAllErrors() {
+            document.querySelectorAll('.field-error').forEach(e => { e.style.display = 'none'; e.innerText = ''; });
         }
 
-        function moveNext(curr, nextId) {
-            if (curr.value.length >= 1) {
-                const n = document.getElementById(nextId);
-                if(n) n.focus();
-            }
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
-        async function verifyOtp() {
-            const code = Array.from(document.querySelectorAll('.otp-box')).map(el => el.value).join('');
-            if (code.length < 6 && isFirebaseActive) return alert("Enter 6-digit code");
-            
-            showLoading(labels.loadingVerify);
-            if (isFirebaseActive) {
-                try {
-                    await confirmationResult.confirm(code);
-                    loginSuccess('USER');
-                } catch (e) { hideLoading(); alert("Invalid Code"); }
+        // ====================== PASSWORD ======================
+        function togglePassword(inputId, toggleEl) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleEl.innerText = '🙈';
             } else {
-                if(code === '123456' || code === '1234') loginSuccess('USER');
-                else { hideLoading(); alert("Invalid Demo Code"); }
+                input.type = 'password';
+                toggleEl.innerText = '👁️';
             }
         }
 
-        function loginSuccess(role) {
-            localStorage.setItem('userRole', role);
-            window.location.href = 'map.html';
+        function checkPasswordStrength(pass) {
+            const bar = document.getElementById('pass-strength-bar');
+            let str = 0;
+            if (pass.length >= 6) str++;
+            if (pass.length >= 10) str++;
+            if (/[A-Z]/.test(pass)) str++;
+            if (/[0-9]/.test(pass)) str++;
+            if (/[^A-Za-z0-9]/.test(pass)) str++;
+
+            const pct = (str / 5) * 100;
+            bar.style.width = pct + '%';
+            if (str <= 1) bar.style.background = '#ef4444';
+            else if (str <= 2) bar.style.background = '#f97316';
+            else if (str <= 3) bar.style.background = '#eab308';
+            else bar.style.background = '#22c55e';
         }
 
-        function toggleEmailMode() {
-            const mode = document.getElementById('email-mode');
-            mode.value = (mode.value === 'login') ? 'signup' : 'login';
-            document.getElementById('confirm-pass-group').style.display = (mode.value === 'signup') ? 'block' : 'none';
-            updateEmailModeText();
+        // ====================== TOAST ======================
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+            toast.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('removing');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
         }
 
-        async function emailAction() {
-            const email = document.getElementById('email').value;
-            const pass = document.getElementById('pass').value;
-            if (!email || !pass) return alert("Fill all fields");
-            
-            showLoading(labels.loadingAuth);
-            try {
-                const mode = document.getElementById('email-mode').value;
-                if (mode === 'signup') await firebase.auth().createUserWithEmailAndPassword(email, pass);
-                else await firebase.auth().signInWithEmailAndPassword(email, pass);
-                loginSuccess('USER');
-            } catch (e) { hideLoading(); alert(e.message); }
-        }
-
-        function handleAdminAuth() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === 'admin123') {
-                showLoading(labels.loadingAdmin);
-                loginSuccess('ADMIN');
-            } else alert("Invalid Admin Key");
-        }
-
+        // ====================== LOADING ======================
         function showLoading(msg) {
             document.getElementById('loading').style.display = 'flex';
-            document.getElementById('loading').querySelector('p').innerText = msg;
+            document.getElementById('loading').querySelector('p').innerText = msg || L.loadingSecuring;
         }
-
         function hideLoading() {
             document.getElementById('loading').style.display = 'none';
         }
 
-        window.onload = () => {
-            const saved = localStorage.getItem('preferredLang') || 'ta-IN';
+        // ====================== FIREBASE ERROR MAPPING ======================
+        function friendlyError(code) {
+            const map = {
+                'auth/user-not-found': 'No account found with this email. Please sign up first.',
+                'auth/wrong-password': 'Incorrect password. Try again or reset it.',
+                'auth/invalid-credential': 'Invalid email or password. Please check and try again.',
+                'auth/email-already-in-use': 'This email is already registered. Try signing in instead.',
+                'auth/weak-password': 'Password is too weak. Use at least 6 characters.',
+                'auth/invalid-email': 'Please enter a valid email address.',
+                'auth/too-many-requests': 'Too many failed attempts. Please wait a moment and try again.',
+                'auth/network-request-failed': 'Network error. Check your internet connection.',
+                'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
+                'auth/popup-blocked': 'Popup was blocked by your browser. Allow popups and try again.',
+                'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
+                'auth/account-exists-with-different-credential': 'An account already exists with a different sign-in method for this email.'
+            };
+            return map[code] || 'Something went wrong. Please try again.';
+        }
+
+        // ====================== SIGN IN (Email/Password) ======================
+        async function handleSignIn() {
+            clearAllErrors();
+            const email = document.getElementById('signin-email').value.trim();
+            const pass = document.getElementById('signin-pass').value;
+
+            let valid = true;
+            if (!email) { showFieldError('signin-email-error', L.errEmailRequired); valid = false; }
+            else if (!validateEmail(email)) { showFieldError('signin-email-error', L.errEmailInvalid); valid = false; }
+            if (!pass) { showFieldError('signin-pass-error', L.errPassRequired); valid = false; }
+            if (!valid) return;
+
+            showLoading(L.loadingAuth);
+            try {
+                const userCredential = await auth.signInWithEmailAndPassword(email, pass);
+                const user = userCredential.user;
+                localStorage.setItem('userRole', 'USER');
+                localStorage.setItem('userName', user.displayName || email.split('@')[0]);
+                localStorage.setItem('userEmail', user.email);
+                showToast(L.toastLoginSuccess, 'success');
+                setTimeout(() => { window.location.href = 'map.html'; }, 800);
+            } catch (e) {
+                hideLoading();
+                const msg = friendlyError(e.code);
+                showToast(msg, 'error');
+                console.error('Sign-in error:', e);
+            }
+        }
+
+        // ====================== SIGN UP (Email/Password) ======================
+        async function handleSignUp() {
+            clearAllErrors();
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const pass = document.getElementById('signup-pass').value;
+            const confirm = document.getElementById('signup-confirm').value;
+
+            let valid = true;
+            if (!name) { showFieldError('signup-name-error', L.errNameRequired); valid = false; }
+            if (!email) { showFieldError('signup-email-error', L.errEmailRequired); valid = false; }
+            else if (!validateEmail(email)) { showFieldError('signup-email-error', L.errEmailInvalid); valid = false; }
+            if (!pass) { showFieldError('signup-pass-error', L.errPassRequired); valid = false; }
+            else if (pass.length < 6) { showFieldError('signup-pass-error', L.errPassShort); valid = false; }
+            if (!confirm) { showFieldError('signup-confirm-error', L.errConfirmRequired); valid = false; }
+            else if (pass !== confirm) { showFieldError('signup-confirm-error', L.errPassMismatch); valid = false; }
+            if (!valid) return;
+
+            showLoading(L.loadingCreate);
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
+                // Update display name
+                await userCredential.user.updateProfile({ displayName: name });
+                localStorage.setItem('userRole', 'USER');
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userEmail', email);
+                showToast(L.toastSignupSuccess, 'success');
+                setTimeout(() => { window.location.href = 'map.html'; }, 800);
+            } catch (e) {
+                hideLoading();
+                const msg = friendlyError(e.code);
+                showToast(msg, 'error');
+                console.error('Sign-up error:', e);
+            }
+        }
+
+        // ====================== GOOGLE AUTH (Sign In OR Sign Up) ======================
+        async function handleGoogleAuth() {
+            showLoading(L.loadingGoogle);
+            try {
+                // Use popup for desktop, redirect for mobile
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                let result;
+                if (isMobile) {
+                    // Redirect approach for mobile (avoids popup blockers)
+                    await auth.signInWithRedirect(googleProvider);
+                    return; // Will handle result on page reload
+                } else {
+                    result = await auth.signInWithPopup(googleProvider);
+                }
+                const user = result.user;
+                localStorage.setItem('userRole', 'USER');
+                localStorage.setItem('userName', user.displayName || 'Driver');
+                localStorage.setItem('userEmail', user.email || '');
+                localStorage.setItem('userPhoto', user.photoURL || '');
+                showToast(L.toastGoogleSuccess, 'success');
+                setTimeout(() => { window.location.href = 'map.html'; }, 800);
+            } catch (e) {
+                hideLoading();
+                if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') {
+                    showToast('Sign-in cancelled.', 'info');
+                } else {
+                    const msg = friendlyError(e.code);
+                    showToast(msg, 'error');
+                }
+                console.error('Google auth error:', e);
+            }
+        }
+
+        // Handle redirect result (for mobile Google auth)
+        auth.getRedirectResult().then((result) => {
+            if (result && result.user) {
+                const user = result.user;
+                localStorage.setItem('userRole', 'USER');
+                localStorage.setItem('userName', user.displayName || 'Driver');
+                localStorage.setItem('userEmail', user.email || '');
+                localStorage.setItem('userPhoto', user.photoURL || '');
+                window.location.href = 'map.html';
+            }
+        }).catch((e) => {
+            if (e.code) {
+                showToast(friendlyError(e.code), 'error');
+            }
+        });
+
+        // ====================== FORGOT PASSWORD ======================
+        async function handleForgotPassword() {
+            const email = document.getElementById('signin-email').value.trim();
+            if (!email) {
+                showFieldError('signin-email-error', L.errEmailRequired);
+                showToast('Enter your email first, then click "Forgot password?"', 'info');
+                document.getElementById('signin-email').focus();
+                return;
+            }
+            if (!validateEmail(email)) {
+                showFieldError('signin-email-error', L.errEmailInvalid);
+                return;
+            }
+
+            showLoading(L.loadingReset);
+            try {
+                await auth.sendPasswordResetEmail(email);
+                hideLoading();
+                showToast(L.toastResetSent, 'success');
+            } catch (e) {
+                hideLoading();
+                showToast(friendlyError(e.code), 'error');
+            }
+        }
+
+        // ====================== ADMIN AUTH ======================
+        function handleAdminAuth() {
+            clearAllErrors();
+            const pass = document.getElementById('adminPass').value;
+            if (!pass) {
+                showFieldError('admin-error', 'Enter the admin key');
+                return;
+            }
+            if (pass === 'admin123') {
+                showLoading(L.loadingAdmin);
+                localStorage.setItem('userRole', 'ADMIN');
+                localStorage.setItem('userName', 'Station Manager');
+                showToast(L.toastAdminSuccess, 'success');
+                setTimeout(() => { window.location.href = 'map.html'; }, 800);
+            } else {
+                showFieldError('admin-error', L.errAdminInvalid);
+                showToast(L.errAdminInvalid, 'error');
+            }
+        }
+
+        // ====================== KEYBOARD SUPPORT ======================
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            if (currentMode === 'signin') handleSignIn();
+            else if (currentMode === 'signup') handleSignUp();
+            else if (currentMode === 'admin') handleAdminAuth();
+        });
+
+        // ====================== INIT ======================
+        window.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('preferredLang') || 'en-US';
             document.getElementById('langSwitch').value = saved;
             changeLanguage();
-        };
+            switchTab('signin');
+        });
     </script>
 </body>
 </html>

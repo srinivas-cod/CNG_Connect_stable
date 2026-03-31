@@ -238,20 +238,20 @@
             </div>
             <div class="footer-nav">
                 <h4 id="footer-platform">Platform</h4>
-                <a href="login.html" id="link-map">Live Map</a>
+                <a href="map.html" id="link-map">Live Map</a>
                 <a href="#features" id="link-feat">Features</a>
                 <a href="#fleet" id="link-fleet">Fleet Solutions</a>
             </div>
             <div class="footer-nav">
                 <h4 id="footer-support">Support</h4>
                 <a href="how-it-works.html" id="link-about">About Us</a>
-                <a href="#" id="link-help">Help Center</a>
-                <a href="#" id="link-contact">Contact Support</a>
+                <a href="how-it-works.html" id="link-help">Help Center</a>
+                <a href="mailto:srinivassriraman0923@gmail.com" id="link-contact">Contact Support</a>
             </div>
             <div class="footer-nav">
                 <h4 id="footer-legal">Legal</h4>
-                <a href="#" id="link-priv">Privacy Policy</a>
-                <a href="#" id="link-terms">Terms of Use</a>
+                <a href="javascript:void(0)" id="link-priv" onclick="openModal('privacy')">Privacy Policy</a>
+                <a href="javascript:void(0)" id="link-terms" onclick="openModal('terms')">Terms of Use</a>
             </div>
         </div>
         <div class="footer-bottom" style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.1);">
@@ -272,6 +272,54 @@
             </div>
         </div>
     </footer>
+
+    <!-- Privacy / Terms Modal -->
+    <div id="legal-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(2,6,23,0.88); backdrop-filter:blur(8px); justify-content:center; align-items:center;" onclick="if(event.target===this)closeModal()">
+        <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:40px; max-width:520px; width:90%; max-height:80vh; overflow-y:auto; position:relative;">
+            <button onclick="closeModal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer; line-height:1;">✕</button>
+            <h2 id="modal-title" style="color:#4ade80; margin-bottom:16px; font-size:1.3rem;"></h2>
+            <div id="modal-body" style="color:#cbd5e1; font-size:0.9rem; line-height:1.8;"></div>
+        </div>
+    </div>
+
+    <script>
+        const legalContent = {
+            privacy: {
+                title: '🔒 Privacy Policy',
+                body: `<p><b>CNG Connect</b> is committed to protecting your privacy.</p><br>
+                <p><b>What we collect:</b> Email address, display name, and usage data when you sign in.</p><br>
+                <p><b>How we use it:</b> To authenticate you and personalize your experience. We do not sell your data to any third parties.</p><br>
+                <p><b>Google Sign-In:</b> If you use Google Sign-In, we receive only your name, email, and profile photo from Google.</p><br>
+                <p><b>Station reports:</b> Any status reports you submit are stored anonymously to help other drivers.</p><br>
+                <p><b>Contact:</b> For any privacy concerns, email <a href="mailto:srinivassriraman0923@gmail.com" style="color:#4ade80;">srinivassriraman0923@gmail.com</a>.</p><br>
+                <p style="color:#64748b; font-size:0.8rem;">Last updated: March 2026 · Designed & Developed by Srinivas S</p>`
+            },
+            terms: {
+                title: '📋 Terms of Use',
+                body: `<p>By using <b>CNG Connect</b>, you agree to the following terms:</p><br>
+                <p><b>1. Usage:</b> This platform is intended for locating CNG stations and planning fuel stops in India.</p><br>
+                <p><b>2. Accuracy:</b> Station status updates are community-reported. We do not guarantee real-time accuracy and are not liable for decisions made based on this data.</p><br>
+                <p><b>3. Account:</b> You are responsible for maintaining the security of your account credentials.</p><br>
+                <p><b>4. Prohibited:</b> Submitting false station reports, misusing admin access, or attempting to disrupt the service is strictly prohibited.</p><br>
+                <p><b>5. Changes:</b> These terms may be updated at any time. Continued use constitutes acceptance.</p><br>
+                <p style="color:#64748b; font-size:0.8rem;">Last updated: March 2026 · Designed & Developed by Srinivas S</p>`
+            }
+        };
+
+        function openModal(type) {
+            const content = legalContent[type];
+            document.getElementById('modal-title').innerText = content.title;
+            document.getElementById('modal-body').innerHTML = content.body;
+            const modal = document.getElementById('legal-modal');
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            document.getElementById('legal-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    </script>
 
     <script>
         const uiLabels = {

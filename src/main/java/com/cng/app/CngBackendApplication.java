@@ -168,11 +168,19 @@ public class CngBackendApplication {
                 createStation("AG&P Pratham - Kochi Vytilla", 9.9670, 76.3150, "Available", 10, "CNG", null, null, "AG&P Pratham", true, "ADMIN"),
                 createStation("IOCL - Kochi Edappally", 10.0260, 76.3080, "Available", 5, "CNG", null, null, "IOCL", false, "USER"),
                 createStation("Adani Total - TVM Kazhakkoottam", 8.5680, 76.8730, "Available", 15, "CNG", null, null, "Adani Gas", true, "ADMIN"),
-                createStation("Relux - Kochi Highway Hub", 9.9312, 76.2673, "Available", 0, "EV_CHARGER", "60kW DC", "CCS2", "Relux", true, "ADMIN")
+                createStation("Relux - Kochi Highway Hub", 9.9312, 76.2673, "Available", 0, "EV_CHARGER", "60kW DC", "CCS2", "Relux", true, "ADMIN"),
+
+                // --- DELHI HUB (New) ---
+                createStation("IGL - Near AIIMS Delhi", 28.5672, 77.2100, "Available", 5, "CNG", null, null, "IGL", true, "ADMIN"),
+                createStation("IGL - Dwarka Sector 10", 28.5833, 77.0667, "Queue", 20, "CNG", null, null, "IGL", true, "ADMIN"),
+
+                // --- UTTAR PRADESH HUB (New) ---
+                createStation("Green Gas - Lucknow Gomti Nagar", 26.8467, 80.9461, "Available", 10, "CNG", null, null, "Green Gas", true, "ADMIN"),
+                createStation("Adani Total - Noida Sector 62", 28.6253, 77.3685, "Available", 5, "CNG", null, null, "Adani Total", true, "ADMIN")
             );
 
             repository.saveAll(stations);
-            System.out.println("Data Seeding Complete. Ready for Nationwide launch (TN, MH, KA, KL, AP, OD & TS).");
+            System.out.println("Data Seeding Complete. Ready for Nationwide launch (9 Regions).");
         };
     }
 

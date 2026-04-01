@@ -91,11 +91,12 @@ body {
 h1 {
   font-size: 4rem;
   margin-bottom: 1.5rem;
-  line-height: 1.2;
+  line-height: 1.1;
+  white-space: pre-wrap;
 }
 
 h1 span {
-  display: block;
+  display: inline-block;
   background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
   background-clip: text;
   -webkit-background-clip: text;

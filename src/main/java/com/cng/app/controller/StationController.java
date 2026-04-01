@@ -46,6 +46,8 @@ public class StationController {
             station.setEvPowerKW(stationDetails.getEvPowerKW());
             station.setConnectorTypes(stationDetails.getConnectorTypes());
             station.setOperator(stationDetails.getOperator());
+            station.setVerified(stationDetails.isVerified());
+            station.setLastUpdatedByRole(stationDetails.getLastUpdatedByRole());
             return stationRepo.save(station);
         }).orElse(null);
     }

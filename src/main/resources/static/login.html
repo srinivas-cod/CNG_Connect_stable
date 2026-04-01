@@ -505,6 +505,7 @@
             <div class="login-tabs" id="auth-tabs">
                 <div class="tab active" onclick="switchTab('signin')" id="tab-signin">Sign In</div>
                 <div class="tab" onclick="switchTab('signup')" id="tab-signup">Sign Up</div>
+                <div class="tab" onclick="switchTab('admin')" id="tab-admin">Manager</div>
             </div>
 
             <!-- ========== SIGN IN SECTION ========== -->
@@ -592,7 +593,14 @@
                     </div>
                     <div class="field-error" id="signup-confirm-error"></div>
                 </div>
-                <button class="btn btn-primary" id="signup-btn" onclick="handleSignUp()">Create Account</button>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label class="checkbox-container" style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                        <input type="checkbox" id="signup-terms" style="width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); margin-top: 2px;">
+                        <span id="terms-text">I agree to the <a href="javascript:void(0)" onclick="openLegal('terms')" style="color: var(--primary); text-decoration: underline;">Terms & Conditions</a> and <a href="javascript:void(0)" onclick="openLegal('privacy')" style="color: var(--primary); text-decoration: underline;">Privacy Policy</a>.</span>
+                    </label>
+                    <div class="field-error" id="signup-terms-error"></div>
+                </div>
+                <button class="btn btn-primary" id="signup-btn" onclick="handleSignUp()" style="margin-top: 20px;">Create Account</button>
             </div>
 
             <!-- ========== ADMIN SECTION ========== -->
@@ -632,7 +640,6 @@
                 </div>
             </div>
 
-            <div class="admin-link" onclick="switchTab('admin')" id="adminSwitch">Station Manager Login</div>
         </div>
     </div>
 
@@ -640,7 +647,57 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
+    <!-- Legal Modal for Login Page -->
+    <div id="legal-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(2,6,23,0.92); backdrop-filter:blur(8px); justify-content:center; align-items:center;" onclick="if(event.target===this)closeLegal()">
+        <div style="background:#161e31; border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:35px; max-width:500px; width:90%; max-height:80vh; overflow-y:auto; position:relative; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+            <button onclick="closeLegal()" style="position:absolute; top:16px; right:20px; background:none; border:none; color:#94a3b8; font-size:22px; cursor:pointer; line-height:1;">✕</button>
+            <h2 id="modal-title" style="color:var(--primary); margin-bottom:16px; font-size:1.3rem;"></h2>
+            <div id="modal-body" style="color:var(--text-secondary); font-size:0.9rem; line-height:1.7;"></div>
+        </div>
+    </div>
+
     <script>
+        // ====================== LEGAL MODAL LOGIC ======================
+        const legalData = {
+            privacy: {
+                title: '🔒 Privacy Policy',
+                body: `<p><b>CNG Connect</b> is dedicated to protecting your data.</p><br>
+                <p><b>1. Collection:</b> We collect Name and Email via Firebase Infrastructure. We never sell your data.</p><br>
+                <p><b>2. Usage:</b> Data is used for authentication and providing "Live Pulse" station status and logs.</p><br>
+                <p><b>3. Security:</b> Your credentials are secured by Google Cloud's end-to-end encryption.</p><br>
+                <p><b>4. Contact:</b> <a href="mailto:srinivassriraman0923@gmail.com" style="color:var(--primary);">srinivassriraman0923@gmail.com</a></p><br>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="privacy-policy.html" style="color: var(--primary); text-decoration: underline; font-weight: 600;">View Full Privacy Policy →</a>
+                </div>
+                <p style="color: #64748b; font-size: 0.8rem; margin-top: 20px;">Revision: April 2026 · Designed & Developed by Srinivas S</p>`
+            },
+            terms: {
+                title: '📜 Terms & Conditions',
+                body: `<p>By creating an account, you agree to these legal terms:</p><br>
+                <p><b>1. IP Ownership:</b> This application's concept, the "TTR" algorithm, original code, and branding are the <b>exclusive Intellectual Property</b> of <b>Srinivas S</b>. Unauthorized copying is strictly prohibited and legally protected.</p><br>
+                <p><b>2. Disclaimer:</b> Station data is community-reported ("As-Is"). We are not liable for any route delays or fuel exhaustion caused by inaccurate status.</p><br>
+                <p><b>3. User Safety:</b> Drivers must not use the app while moving. Always park safely before checking the map.</p><br>
+                <p><b>4. Fair Use:</b> Submitting false reports or disrupting the service results in account termination.</p><br>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="terms-and-conditions.html" style="color: var(--primary); text-decoration: underline; font-weight: 600;">View Full Legal Contract →</a>
+                </div>
+                <p style="color: #64748b; font-size: 0.8rem; margin-top: 20px;">Revision: April 2026 · Designed & Developed by Srinivas S</p>`
+            }
+        };
+
+        function openLegal(type) {
+            const content = legalData[type];
+            document.getElementById('modal-title').innerText = content.title;
+            document.getElementById('modal-body').innerHTML = content.body;
+            document.getElementById('legal-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLegal() {
+            document.getElementById('legal-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
         // ====================== CONFIG ======================
         const firebaseConfig = {
             apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
@@ -661,7 +718,7 @@
         const uiLabels = {
             'en-US': {
                 tagline: 'Your premium navigation companion',
-                tabSignIn: 'Sign In', tabSignUp: 'Sign Up',
+                tabSignIn: 'Sign In', tabSignUp: 'Sign Up', tabAdmin: 'Manager',
                 signinEmailLabel: 'Email Address', signinPassLabel: 'Password',
                 forgotLink: 'Forgot password?',
                 signinBtn: 'Sign In',
@@ -687,11 +744,13 @@
                 errEmailRequired: 'Email is required', errEmailInvalid: 'Enter a valid email address',
                 errPassRequired: 'Password is required', errPassShort: 'Password must be at least 6 characters',
                 errNameRequired: 'Name is required', errConfirmRequired: 'Confirm your password',
-                errPassMismatch: 'Passwords do not match', errAdminInvalid: 'Invalid Admin Key'
+                errPassMismatch: 'Passwords do not match', errAdminInvalid: 'Invalid Admin Key',
+                errTermsRequired: 'You must agree to the Terms & Privacy Policy',
+                termsText: 'I agree to the <a href="javascript:void(0)" onclick="openLegal(\'terms\')" style="color: var(--primary); text-decoration: underline;">Terms & Conditions</a> and <a href="javascript:void(0)" onclick="openLegal(\'privacy\')" style="color: var(--primary); text-decoration: underline;">Privacy Policy</a>.'
             },
             'ta-IN': {
                 tagline: 'உங்கள் பிரீமியம் வழிசெலுத்தல் துணையாக',
-                tabSignIn: 'உள்நுழைக', tabSignUp: 'பதிவு செய்க',
+                tabSignIn: 'உள்நுழைக', tabSignUp: 'பதிவு செய்க', tabAdmin: 'மேலாளர்',
                 signinEmailLabel: 'மின்னஞ்சல் முகவரி', signinPassLabel: 'கடவுச்சொல்',
                 forgotLink: 'கடவுச்சொல் மறந்துவிட்டதா?',
                 signinBtn: 'உள்நுழைக',
@@ -717,7 +776,9 @@
                 errEmailRequired: 'மின்னஞ்சல் தேவை', errEmailInvalid: 'சரியான மின்னஞ்சலை உள்ளிடவும்',
                 errPassRequired: 'கடவுச்சொல் தேவை', errPassShort: 'கடவுச்சொல் குறைந்தது 6 எழுத்துகள்',
                 errNameRequired: 'பெயர் தேவை', errConfirmRequired: 'கடவுச்சொல்லை உறுதிப்படுத்தவும்',
-                errPassMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை', errAdminInvalid: 'தவறான நிர்வாகி சாவி'
+                errPassMismatch: 'கடவுச்சொற்கள் பொருந்தவில்லை', errAdminInvalid: 'தவறான நிர்வாகி சாவி',
+                errTermsRequired: 'விதிமுறைகளை நீங்கள் ஏற்க வேண்டும்',
+                termsText: 'நான் <a href="javascript:void(0)" onclick="openLegal(\'terms\')" style="color: var(--primary); text-decoration: underline;">விதிமுறைகள்</a> மற்றும் <a href="javascript:void(0)" onclick="openLegal(\'privacy\')" style="color: var(--primary); text-decoration: underline;">தனியுரிமைக் கொள்கை</a>யை ஏற்றுக்கொள்கிறேன்.'
             }
         };
 
@@ -733,6 +794,7 @@
             document.getElementById('tagline').innerText = L.tagline;
             document.getElementById('tab-signin').innerText = L.tabSignIn;
             document.getElementById('tab-signup').innerText = L.tabSignUp;
+            document.getElementById('tab-admin').innerText = L.tabAdmin;
             document.getElementById('signin-email-label').innerText = L.signinEmailLabel;
             document.getElementById('signin-pass-label').innerText = L.signinPassLabel;
             document.getElementById('forgot-link').innerText = L.forgotLink;
@@ -750,10 +812,10 @@
             document.getElementById('admin-title').innerText = L.adminTitle;
             document.getElementById('admin-key-label').innerText = L.adminKeyLabel;
             document.getElementById('admin-btn').innerText = L.adminBtn;
+            document.getElementById('terms-text').innerHTML = L.termsText;
 
             // Update toggle text based on current mode
             updateToggleText();
-            updateAdminLinkText();
         }
 
         let currentMode = 'signin'; // 'signin', 'signup', 'admin'
@@ -762,18 +824,9 @@
             if (currentMode === 'signin') {
                 document.getElementById('toggle-text').innerText = L.toggleNoAcc;
                 document.getElementById('toggle-link').innerText = L.toggleToSignup;
-            } else {
+            } else if (currentMode === 'signup') {
                 document.getElementById('toggle-text').innerText = L.toggleHasAcc;
                 document.getElementById('toggle-link').innerText = L.toggleToSignin;
-            }
-        }
-
-        function updateAdminLinkText() {
-            const link = document.getElementById('adminSwitch');
-            if (currentMode === 'admin') {
-                link.innerText = L.adminBack;
-            } else {
-                link.innerText = L.adminLink;
             }
         }
 
@@ -787,6 +840,7 @@
             const toggleArea = document.getElementById('toggle-auth-area');
             const tabSignin = document.getElementById('tab-signin');
             const tabSignup = document.getElementById('tab-signup');
+            const tabAdmin = document.getElementById('tab-admin');
 
             // Reset
             signinSection.style.display = 'none';
@@ -794,26 +848,24 @@
             adminSection.style.display = 'none';
             tabSignin.classList.remove('active');
             tabSignup.classList.remove('active');
+            tabAdmin.classList.remove('active');
             clearAllErrors();
 
             if (tab === 'signin') {
                 signinSection.style.display = 'block';
                 tabSignin.classList.add('active');
-                authTabs.style.display = 'flex';
                 toggleArea.style.display = 'block';
             } else if (tab === 'signup') {
                 signupSection.style.display = 'block';
                 tabSignup.classList.add('active');
-                authTabs.style.display = 'flex';
                 toggleArea.style.display = 'block';
             } else if (tab === 'admin') {
                 adminSection.style.display = 'block';
-                authTabs.style.display = 'none';
+                tabAdmin.classList.add('active');
                 toggleArea.style.display = 'none';
             }
 
             updateToggleText();
-            updateAdminLinkText();
         }
 
         function toggleAuthMode() {
@@ -954,7 +1006,15 @@
             if (!pass) { showFieldError('signup-pass-error', L.errPassRequired); valid = false; }
             else if (pass.length < 6) { showFieldError('signup-pass-error', L.errPassShort); valid = false; }
             if (!confirm) { showFieldError('signup-confirm-error', L.errConfirmRequired); valid = false; }
-            else if (pass !== confirm) { showFieldError('signup-confirm-error', L.errPassMismatch); valid = false; }
+            if (pass !== confirm) { showFieldError('signup-confirm-error', L.errPassMismatch); valid = false; }
+            
+            const termsCheck = document.getElementById('signup-terms');
+            if (termsCheck && !termsCheck.checked) {
+                showFieldError('signup-terms-error', L.errTermsRequired);
+                showToast(L.errTermsRequired, 'error');
+                valid = false;
+            }
+
             if (!valid) return;
 
             showLoading(L.loadingCreate);

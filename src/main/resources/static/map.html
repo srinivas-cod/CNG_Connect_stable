@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Map | CNG Connect Live</title>
+  <title>CNG Connect | Smart Wayfinding for India</title>
+  <meta name="description" content="Nationwide real-time CNG ecosystem with the Live Pulse and TTR algorithms. Navigate smarter across India.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -765,6 +766,11 @@
     <div class="legend-item"><span class="dot bg-orange"></span> <b>Live Queue</b> (Wait time)</div>
     <div class="legend-item"><span class="dot bg-red"></span> <b>Out of Service</b> (Empty)</div>
     <div class="legend-item"><span class="dot bg-blue"></span> Your Location</div>
+    <div style="margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+      <a href="privacy-policy.html" target="_blank" style="color: #94a3b8; text-decoration: none;">Privacy</a>
+      <a href="terms-and-conditions.html" target="_blank" style="color: #94a3b8; text-decoration: none;">Terms</a>
+      <span style="color: #475569;">&copy; 2026 Srinivas S</span>
+    </div>
   </div>
 
   <!-- Scripts -->
@@ -1258,8 +1264,8 @@
       searchBtn.innerHTML = '<span class="loading-spinner">⌛</span>';
 
       let query = q;
-      if (!query.toLowerCase().includes('tamil nadu')) {
-        query += ", Tamil Nadu";
+      if (!query.toLowerCase().includes('india')) {
+        query += ", India";
       }
 
       try {
@@ -1301,7 +1307,7 @@
 
     async function getCoordinates(q) {
       let query = q;
-      if (!query.toLowerCase().includes('tamil nadu')) query += ", Tamil Nadu";
+      if (!query.toLowerCase().includes('india')) query += ", India";
       const resp = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`);
       const data = await resp.json();
       if (data && data.length > 0) return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
@@ -1315,14 +1321,16 @@
         .then(data => {
           stations = data.map(s => ({
             id: s.id, name: s.name, status: (s.status || '').toLowerCase(),
-            lat: s.location.lat, lng: s.location.lng,
+            lat: (s.location && s.location.lat) || 0, 
+            lng: (s.location && s.location.lng) || 0,
             fuelType: s.fuelType || 'CNG',
             evPower: s.evPowerKW,
             connectors: s.connectorTypes,
             operator: s.operator,
             verified: s.verified,
-            lastRole: s.lastUpdatedByRole
-          }));
+            lastRole: s.lastUpdatedByRole,
+            lastUpdated: s.lastUpdated
+          })).filter(s => s.lat !== 0 && s.lng !== 0);
           renderStationMarkers();
         });
     }

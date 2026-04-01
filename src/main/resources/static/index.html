@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CNG Connect | Smart Wayfinding for Chennai</title>
+    <title>CNG Connect | Smart Wayfinding for India</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Navigating the future of clean energy. Live CNG station status, queue times, and trip planning for professional drivers.">
     <meta name="author" content="Srinivas">
@@ -49,7 +49,7 @@
         <!-- Hero Section -->
         <section class="container hero" style="min-height: 85vh;">
             <div class="hero-content">
-                <div class="badge" id="hero-badge">🚀 LIVE IN CHENNAI & COIMBATORE</div>
+                <div class="badge" id="hero-badge">🚀 LIVE ACROSS INDIA: TN, MH, KA, KL, AP, OD & TS</div>
                 <h1 id="hero-title">Solving the <span>Fuel Crisis</span>. One Station at a Time.</h1>
                 <p class="subtitle" id="hero-subtitle">
                     The only real-time ecosystem designed specifically for the Indian CNG community. 
@@ -106,8 +106,8 @@
         <!-- Stats Section -->
         <section class="stats-bar">
             <div class="stat-item">
-                <span class="stat-num" id="stat-num-hubs">35+</span>
-                <p id="stat-hubs">Verified Hubs</p>
+                <span class="stat-num" id="stat-num-hubs">110+</span>
+                <p id="stat-hubs">Nationwide Hubs</p>
             </div>
             <div class="stat-item">
                 <span class="stat-num" id="stat-num-queue">0s</span>
@@ -181,7 +181,7 @@
         <section class="container" style="padding: 100px 20px; background: rgba(34, 197, 94, 0.05);">
             <div class="section-title">
                 <h2 id="trip-header">Plan Smarter for <span>Long Hauls</span></h2>
-                <p id="trip-desc">Going to Bangalore or Puducherry? Check fuel status for 10+ stations along your route at once.</p>
+                <p id="trip-desc">Going to Mumbai, Bangalore, or Bhubaneswar? Check fuel status for 110+ stations across 7 states at once.</p>
             </div>
             <div class="btn-group">
                  <a href="plan-trip.html" target="_blank" class="btn btn-primary" id="btn-start-plan">Start Planning</a>
@@ -234,7 +234,7 @@
                     <span>CNG Connect</span>
                     <span style="font-size: 0.85rem; color: #cbd5e1; font-weight: 500; font-family: 'Outfit', sans-serif;">Designed & Developed by <b style="color: #fbbf24; font-size: 1.1rem; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);">Srinivas S</b></span>
                 </a>
-                <p id="footer-bio">Built for the hard-working drivers of Chennai. Navigate smarter, refuel faster.</p>
+                <p id="footer-bio">Built for the hard-working drivers of India. Navigate smarter, refuel faster across TN, MH, KA, KL, AP, OD & TS.</p>
             </div>
             <div class="footer-nav">
                 <h4 id="footer-platform">Platform</h4>
@@ -286,23 +286,30 @@
         const legalContent = {
             privacy: {
                 title: '🔒 Privacy Policy',
-                body: `<p><b>CNG Connect</b> is committed to protecting your privacy.</p><br>
-                <p><b>What we collect:</b> Email address, display name, and usage data when you sign in.</p><br>
-                <p><b>How we use it:</b> To authenticate you and personalize your experience. We do not sell your data to any third parties.</p><br>
-                <p><b>Google Sign-In:</b> If you use Google Sign-In, we receive only your name, email, and profile photo from Google.</p><br>
-                <p><b>Station reports:</b> Any status reports you submit are stored anonymously to help other drivers.</p><br>
-                <p><b>Contact:</b> For any privacy concerns, email <a href="mailto:srinivassriraman0923@gmail.com" style="color:#4ade80;">srinivassriraman0923@gmail.com</a>.</p><br>
-                <p style="color:#64748b; font-size:0.8rem;">Last updated: March 2026 · Designed & Developed by Srinivas S</p>`
+                body: `<p><b>CNG Connect</b> ("we", "us", or "our") is dedicated to protecting your personal data. This policy explains how we handle your information.</p><br>
+                <p><b>1. Information Collection:</b> We collect information you provide directly (Name, Email) through Firebase Authentication and Google Sign-In. We also collect anonymous usage data to improve our "Live Pulse" technology.</p><br>
+                <p><b>2. Data Usage:</b> Your data is used solely to provide personalized navigation, manage your account, and authenticate status reports. We <b>never sell</b> your personal information to third parties.</p><br>
+                <p><b>3. Cookies & Storage:</b> We use local storage and essential cookies to keep you signed in and remember your preferences (like language settings).</p><br>
+                <p><b>4. Third-Party Services:</b> We utilize Google Firebase for authentication and OpenStreetMap for mapping. Their respective privacy policies apply to data processed through their services.</p><br>
+                <p><b>5. Your Rights:</b> You can request account deletion at any time by contacting support.</p><br>
+                <p><b>6. Contact:</b> <a href="mailto:srinivassriraman0923@gmail.com" style="color:#4ade80;">srinivassriraman0923@gmail.com</a></p><br>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="privacy-policy.html" style="color: #4ade80; text-decoration: underline; font-weight: 600;">View Full Privacy Policy →</a>
+                </div>
+                <p style="color:#64748b; font-size:0.8rem; margin-top: 20px;">Revision: 3.0 (April 2026) · Designed & Developed by Srinivas S</p>`
             },
             terms: {
-                title: '📋 Terms of Use',
-                body: `<p>By using <b>CNG Connect</b>, you agree to the following terms:</p><br>
-                <p><b>1. Usage:</b> This platform is intended for locating CNG stations and planning fuel stops in India.</p><br>
-                <p><b>2. Accuracy:</b> Station status updates are community-reported. We do not guarantee real-time accuracy and are not liable for decisions made based on this data.</p><br>
-                <p><b>3. Account:</b> You are responsible for maintaining the security of your account credentials.</p><br>
-                <p><b>4. Prohibited:</b> Submitting false station reports, misusing admin access, or attempting to disrupt the service is strictly prohibited.</p><br>
-                <p><b>5. Changes:</b> These terms may be updated at any time. Continued use constitutes acceptance.</p><br>
-                <p style="color:#64748b; font-size:0.8rem;">Last updated: March 2026 · Designed & Developed by Srinivas S</p>`
+                title: '📜 Terms & Conditions',
+                body: `<p>By accessing <b>CNG Connect</b>, you agree to these legally binding terms designed to protect this platform and its community.</p><br>
+                <p><b>1. Intellectual Property (IP) Protection:</b> The entire concept of "Live Pulse" station monitoring, real-time "Total Time to Refill" (TTR) algorithms, original code, UI design, and branding are the <b>exclusive property</b> of <b>Srinivas S</b>. Unauthorized copying, reverse-engineering, or creation of derivative works of this idea or code is strictly prohibited and protected by international copyright and IP laws.</p><br>
+                <p><b>2. Disclaimer of Accuracy:</b> Station status reports are community-driven. While we strive for accuracy, we provide the service "AS IS". We are not responsible for any losses, delays, or fuel exhaustion resulting from inaccurate station status.</p><br>
+                <p><b>3. User Safety:</b> Drivers must prioritize road safety and never use the application while the vehicle is in motion.</p><br>
+                <p><b>4. Limitation of Liability:</b> In no event shall <b>Srinivas S</b> or CNG Connect be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p><br>
+                <p><b>5. Governing Law:</b> These terms are governed by the laws of India. Any disputes will be subject to the exclusive jurisdiction of the courts in Chennai.</p><br>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="terms-and-conditions.html" style="color: #4ade80; text-decoration: underline; font-weight: 600;">View Full Legal Contract →</a>
+                </div>
+                <p style="color:#64748b; font-size:0.8rem; margin-top: 20px;">Revision: 3.0 (April 2026) · Designed & Developed by Srinivas S</p>`
             }
         };
 
@@ -330,12 +337,12 @@
                 navAbout: 'About',
                 navPlan: 'Plan Trip',
                 btnLogin: 'Sign In',
-                heroBadge: '🚀 LIVE IN CHENNAI & COIMBATORE',
+                heroBadge: '🚀 LIVE ACROSS INDIA: TN, MH, KA, KL, AP, OD & TS',
                 heroTitle: 'Solving the <span>Fuel Crisis</span>. One Station at a Time.',
                 heroSubtitle: 'The only real-time ecosystem designed specifically for the Indian CNG community. Eliminate 2-hour queues with our "Live Pulse" technology, built for drivers, by drivers.',
                 btnLaunch: 'Launch Live Map',
                 btnPlanHero: 'Plan Your Trip',
-                statHubs: 'Verified Hubs',
+                statHubs: 'Nationwide Hubs',
                 statQueue: 'Queue Blindness',
                 statTime: 'Daily Time Saved',
                 stationIO: 'IO Petrol - T.Nagar',
@@ -368,7 +375,7 @@
                 step4Title: 'Plan Your Trip',
                 step4Desc: 'For long journeys, plan your route with multiple CNG stops, checking their status in advance.',
                 tripHeader: 'Plan Smarter for <span>Long Hauls</span>',
-                tripDesc: 'Going to Bangalore or Puducherry? Check fuel status for 10+ stations along your route at once.',
+                tripDesc: 'Going to Mumbai, Bangalore, or Bhubaneswar? Check fuel status for 110+ stations across 7 states at once.',
                 btnStartPlan: 'Start Planning',
                 badgePitch: '🏛️ PITCH READY',
                 fleetTitle: 'Government & <span>Fleet Solutions</span>',
@@ -377,7 +384,7 @@
                 labelCityIndex: 'City-Wide Congestion Index',
                 labelHotspots: 'Active Hotspots',
                 labelSupply: 'Supply Efficiency',
-                footerBio: 'Built for the hard-working drivers of Chennai. Navigate smarter, refuel faster.',
+                footerBio: 'Built for the hard-working drivers of India. Navigate smarter, refuel faster across TN, MH, KA, KL, AP, OD & TS.',
                 footerPlatform: 'Platform',
                 linkMap: 'Live Map',
                 linkFeat: 'Features',
@@ -399,12 +406,12 @@
                 navAbout: 'எங்களை பற்றி',
                 navPlan: 'பயணத் திட்டம்',
                 btnLogin: 'உள்நுழைக',
-                heroBadge: '🚀 சென்னை மற்றும் கோவையில் நேரலையில் உள்ளது',
+                heroBadge: '🚀 இந்தியா முழுவதும் நேரலையில் உள்ளது: TN, MH, KA, KL, AP, OD & TS',
                 heroTitle: '<span>எரிபொருள் நெருக்கடி</span>க்கு தீர்வு. ஒவ்வொரு நிலையமாக.',
                 heroSubtitle: 'இந்திய CNG சமூகத்திற்காக பிரத்யேகமாக வடிவமைக்கப்பட்ட ஒரே தொழில்நுட்பம். 2 மணிநேர வரிசைகளை எங்கள் "லைவ் பல்ஸ்" தொழில்நுட்பம் மூலம் நீக்குங்கள், ஓட்டுநர்களுக்காக ஓட்டுநர்களால் உருவாக்கப்பட்டது.',
                 btnLaunch: 'வரைபடத்தைத் திறக்கவும்',
                 btnPlanHero: 'உங்கள் பயணத்தைத் திட்டமிடுங்கள்',
-                statHubs: 'சரிபார்க்கப்பட்ட மையங்கள்',
+                statHubs: 'தேசம் தழுவிய மையங்கள்',
                 statQueue: 'வரிசை தெரியாமை',
                 statTime: 'தினசரி நேரம் சேமிக்கப்பட்டது',
                 stationIO: 'ஐஓ பெட்ரோல் - டி.நகர்',
@@ -437,7 +444,7 @@
                 step4Title: 'உங்கள் பயணத்தைத் திட்டமிடுங்கள்',
                 step4Desc: 'நீண்ட பயணங்களுக்கு, உங்கள் வழியில் பல CNG நிறுத்தங்களுடன் உங்கள் பயணத்தைத் திட்டமிடுங்கள், அவற்றின் நிலையை முன்கூட்டியே சரிபார்க்கவும்.',
                 tripHeader: '<span>நீண்ட பயண</span>த் திட்டம்',
-                tripDesc: 'பெங்களூர் அல்லது புதுச்சேரி செல்கிறீர்களா? உங்கள் வழியில் உள்ள 10+ நிலையங்களைப் பார்க்கவும்.',
+                tripDesc: 'மும்பை, பெங்களூர் அல்லது புவனேஸ்வர் செல்கிறீர்களா? 7 மாநிலங்களில் உள்ள 110+ நிலையங்களைப் பார்க்கவும்.',
                 btnStartPlan: 'திட்டமிடத் தொடங்கு',
                 badgePitch: '🏛️ பிட்ச் தயார்',
                 fleetTitle: 'அரசாங்கம் மற்றும் <span>கார்ப்பரேட் தீர்வுகள்</span>',
@@ -446,7 +453,7 @@
                 labelCityIndex: 'நகரம் தழுவிய நெரிசல் குறியீடு',
                 labelHotspots: 'செயலில் உள்ள இடங்கள்',
                 labelSupply: 'விநியோக திறன்',
-                footerBio: 'சென்னையின் உழைக்கும் ஓட்டுநர்களுக்காக உருவாக்கப்பட்டது. புத்திசாலித்தனமாகச் சென்று, வேகமாக எரிபொருளை நிரப்பவும்.',
+                footerBio: 'இந்தியாவின் உழைக்கும் ஓட்டுநர்களுக்காக உருவாக்கப்பட்டது. TN, MH, KA, KL, AP, OD & TS எங்கும் புத்திசாலித்தனமாகச் செல்லுங்கள்.',
                 footerPlatform: 'தளம்',
                 linkMap: 'நேரடி வரைபடம்',
                 linkFeat: 'அம்சங்கள்',

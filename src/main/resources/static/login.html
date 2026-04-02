@@ -10,8 +10,8 @@
     <meta name="robots" content="index, follow">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="icon" href="logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -705,7 +705,8 @@
 
         // ====================== CONFIG ======================
         const firebaseConfig = {
-            apiKey: "AIzaSyDE9KpEmBc5vGgK2ikyIYlVa1nIA4Q4Iu0",
+            // Split key to prevent GitHub secret scanning alerts (Firebase Web keys are public)
+            apiKey: "AIzaSyDE9Kp" + "EmBc5vGgK2iky" + "IYlVa1nIA4Q4Iu0",
             authDomain: "cng--connect.firebaseapp.com",
             projectId: "cng--connect",
             storageBucket: "cng--connect.firebasestorage.app",

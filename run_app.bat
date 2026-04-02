@@ -1,8 +1,14 @@
 @echo off
 echo Starting CNG Connect Backend...
-echo Checking for Maven...
 
-mvn -version >nul 2>&1
+if exist .env (
+    echo Loading environment variables from .env...
+    for /f "usebackq tokens=1,* delims==" %%A in (".env") do (
+        set "%%A=%%B"
+    )
+)
+
+echo Checking for Maven...mvn -version >nul 2>&1
 if %errorlevel% neq 0 (
     echo [ERROR] Maven is not installed or not in your PATH.
     echo Please install Maven from https://maven.apache.org/download.cgi

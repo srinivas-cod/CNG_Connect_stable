@@ -201,7 +201,7 @@
                     <h2 id="fleet-title">Government & <span>Fleet Solutions</span></h2>
                     <p id="fleet-desc">Our platform provides actionable insights for regional transport authorities and logistics companies. Reduce city-wide congestion and optimize fuel supply trucks with our heatmap technology.</p>
                     <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <a href="#" class="btn btn-primary" id="btn-pilot">Request Pilot Access</a>
+                        <a href="javascript:void(0)" onclick="openPilotModal()" class="btn btn-primary" id="btn-pilot">Request Pilot Access</a>
                     </div>
                 </div>
                 <div class="fleet-mockup" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -287,6 +287,40 @@
         </div>
     </div>
 
+    <!-- Fleet Pilot Modal -->
+    <div id="pilot-modal" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(2,6,23,0.88); backdrop-filter:blur(8px); justify-content:center; align-items:center;" onclick="if(event.target===this)closePilotModal()">
+        <div style="background:#0f172a; border:1px solid var(--primary); border-radius:24px; padding:40px; max-width:500px; width:90%; position:relative; box-shadow: 0 0 40px rgba(34, 197, 94, 0.1);">
+            <button onclick="closePilotModal()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#94a3b8; font-size:24px; cursor:pointer;">✕</button>
+            <h2 style="color:var(--light); margin-bottom:10px; font-size:1.8rem; display:flex; align-items:center; gap:10px;">
+                <span style="color:var(--primary);">B2B</span> Fleet Pilot
+            </h2>
+            <p style="color:#94a3b8; font-size:0.95rem; margin-bottom:30px;">Request early access to the CNG Connect enterprise heatmap & dispatcher dashboard.</p>
+            
+            <form id="pilotForm" onsubmit="submitPilot(event)">
+                <div style="margin-bottom:20px;">
+                    <label style="display:block; color:#cbd5e1; margin-bottom:8px; font-size:0.9rem; font-weight:600;">Company Name</label>
+                    <input type="text" required style="width:100%; padding:14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; font-family:'Outfit', sans-serif;">
+                </div>
+                <div style="display:flex; gap:15px; margin-bottom:20px; flex-wrap: wrap;">
+                    <div style="flex:1; min-width: 200px;">
+                        <label style="display:block; color:#cbd5e1; margin-bottom:8px; font-size:0.9rem; font-weight:600;">Work Email</label>
+                        <input type="email" required style="width:100%; padding:14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; font-family:'Outfit', sans-serif;">
+                    </div>
+                    <div style="flex:1; min-width: 150px;">
+                        <label style="display:block; color:#cbd5e1; margin-bottom:8px; font-size:0.9rem; font-weight:600;">Fleet Size</label>
+                        <select required style="width:100%; padding:14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:white; font-family:'Outfit', sans-serif;">
+                            <option value="" disabled selected>Select size...</option>
+                            <option value="1-10">1 - 10</option>
+                            <option value="11-50">11 - 50</option>
+                            <option value="50+">50+</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:16px; border-radius:16px; font-size:1.1rem; border:none; margin-top:10px; font-family:'Outfit', sans-serif;">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
     <script>
         const legalContent = {
             privacy: {
@@ -330,7 +364,37 @@
             document.getElementById('legal-modal').style.display = 'none';
             document.body.style.overflow = '';
         }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        
+        function openPilotModal() {
+            document.getElementById('pilot-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePilotModal() {
+            document.getElementById('pilot-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        function submitPilot(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerHTML = 'Sending...';
+            btn.style.opacity = '0.7';
+            setTimeout(() => {
+                alert("Thank you! Your enterprise pilot request has been logged. Our B2B onboarding team will contact you within 24 hours.");
+                closePilotModal();
+                e.target.reset();
+                btn.innerHTML = 'Submit Request';
+                btn.style.opacity = '1';
+            }, 1000);
+        }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'Escape') {
+                closeModal();
+                closePilotModal();
+            }
+        });
     </script>
 
     <script>

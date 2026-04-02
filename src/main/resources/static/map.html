@@ -3,9 +3,16 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>CNG Connect | Smart Wayfinding for India</title>
-  <meta name="description" content="Nationwide real-time CNG ecosystem with the Live Pulse and TTR algorithms. Navigate smarter across India.">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CNG Connect | Official Real-Time Hub</title>
+  <meta name="description" content="Official CNG Connect platform for real-time station monitoring and trip optimization. Built with standard safety protocols.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="author" content="Srinivas S">
+  <meta property="og:title" content="CNG Connect | Official Station Map">
+  <meta property="og:description" content="Navigate smarter with real-time fuel status across India. Official developer: Srinivas S.">
+  <meta property="og:type" content="website">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
   <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
@@ -70,15 +77,16 @@
     /* --- Floating Header Controls --- */
     .header-controls {
       position: absolute;
-      top: 20px;
+      top: 15px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 1001;
       display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
       gap: 10px;
       width: 95%;
-      max-width: 700px;
-      transition: all 0.3s ease;
+      max-width: 800px;
       pointer-events: auto;
     }
 
@@ -173,15 +181,36 @@
 
     @media (max-width: 600px) {
       .header-controls {
-        flex-direction: column;
         top: 10px;
-        gap: 8px;
+        gap: 6px;
       }
 
-      .btn-icon {
+      .search-box {
         width: 100%;
-        margin-left: 0 !important;
-        padding: 18px !important;
+        order: 2;
+      }
+
+      .voice-controls {
+        width: 100%;
+        justify-content: space-between;
+        order: 3;
+      }
+
+      .voice-controls .night-toggle {
+        flex: 1;
+      }
+
+      #nearestBtn {
+        width: 100%;
+        order: 4;
+        padding: 12px !important;
+      }
+
+      .dev-badge {
+        order: 1;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 2px;
       }
 
       .side-panel {
@@ -189,25 +218,30 @@
         right: 0 !important;
         top: auto !important;
         bottom: 0 !important;
-        border-radius: 24px 24px 0 0 !important;
-        max-height: 50vh !important;
+        height: 60vh !important;
+        border-radius: 28px 28px 0 0 !important;
+        transform: translateY(0);
       }
 
-      .nav-placeholder {
-        font-size: 14px;
+      .side-panel.collapsed {
+        transform: translateY(calc(100% - 60px));
       }
 
       .map-overlay {
-        top: 200px !important;
-        bottom: auto !important;
+        bottom: 70px !important;
         left: 10px !important;
         padding: 10px !important;
         font-size: 11px !important;
-        max-width: 150px !important;
+        max-width: 160px !important;
+        background: rgba(255,255,255,0.95) !important;
       }
-      
-      .map-overlay h4 span:nth-child(2) {
-        display: none !important; /* Hide developed by on mobile legend to save space */
+
+      .sos-btn {
+        bottom: 75px !important;
+        right: 15px !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 10px !important;
       }
     }
 
@@ -277,6 +311,10 @@
       overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.4);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .side-panel.collapsed {
+      transform: translateX(350px);
     }
 
     .panel-header {
@@ -710,7 +748,7 @@
 <body>
   <!-- Professional Floating Sidebar (Search) -->
   <div class="header-controls">
-    <div style="background: var(--glass); display: flex; align-items: center; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow); white-space: nowrap; gap: 5px;">
+    <div class="dev-badge" style="background: var(--glass); display: flex; align-items: center; padding: 6px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.3); box-shadow: var(--shadow); white-space: nowrap; gap: 5px;">
       <span style="font-size: 0.65rem; color: var(--dark); font-weight: 600;">by</span>
       <b style="color: #fbbf24; font-size: 0.85rem; text-shadow: 0 0 5px rgba(251, 191, 36, 0.5);">Srinivas S</b>
     </div>
@@ -1113,10 +1151,17 @@
         document.getElementById('distVal').innerText = (route.summary.totalDistance / 1000).toFixed(1) + ' ' + labels.km;
         document.getElementById('timeVal').innerHTML = `<span title="${labels.min}">${totalTime} ${labels.min}</span>`;
 
-        const stationsAlongRoute = findStationsNearPath(routeCoords, 2.5);
+        const stationsAlongRoute = findStationsNearPath(routeCoords, 3.5);
         updateJourneyLegend(waypoints, stationsAlongRoute);
         updateDirections(instructions, routeCoords);
       }).addTo(map);
+    }
+
+    function recalculateStations() {
+      if (lastCoords && waypoints.length > 0) {
+        const stationsAlongRoute = findStationsNearPath(lastCoords, 3.5);
+        updateJourneyLegend(waypoints, stationsAlongRoute);
+      }
     }
 
     function showDirectionBubble(lat, lng, text) {
@@ -1345,6 +1390,8 @@
             lastUpdated: s.lastUpdated
           })).filter(s => s.lat !== 0 && s.lng !== 0);
           renderStationMarkers();
+          // If we have an active route, refresh the legend once stations are loaded
+          recalculateStations();
         });
     }
 
@@ -1534,12 +1581,11 @@
 
     document.getElementById('togglePanel').onclick = function () {
       const p = document.getElementById('sidePanel');
-      if (p.style.transform === 'translateX(350px)') {
-        p.style.transform = 'translateX(0)';
-        this.innerText = '⌵';
-      } else {
-        p.style.transform = 'translateX(350px)';
+      p.classList.toggle('collapsed');
+      if (p.classList.contains('collapsed')) {
         this.innerText = '🗺️';
+      } else {
+        this.innerText = '⌵';
       }
     };
     function triggerSOS() {
@@ -1573,6 +1619,7 @@
 
     document.getElementById('nearestBtn').onclick = triggerSOS;
     document.getElementById('sosBtn').onclick = triggerSOS;
+    document.getElementById('generateBtn').onclick = recalculateStations;
 
     document.getElementById('voiceToggle').onclick = function () {
       voiceEnabled = !voiceEnabled;
@@ -1608,7 +1655,7 @@
       if (lastInstructions && lastCoords) {
         updateDirections(lastInstructions, lastCoords);
       }
-      updateJourneyLegend(waypoints, []);
+      recalculateStations();
     };
 
     window.addEventListener('DOMContentLoaded', async () => {

@@ -3,17 +3,23 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>CNG Connect | Smart Wayfinding for India</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Navigating the future of clean energy. Live CNG station status, queue times, and trip planning for professional drivers.">
-    <meta name="author" content="Srinivas">
-    
+    <title>CNG Connect | Official Real-Time Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Official CNG Connect platform for real-time station monitoring and trip optimization. Built with standard safety protocols by Srinivas S.">
+    <meta name="author" content="Srinivas S">
+    <meta name="robots" content="index, follow">
+
     <!-- Open Graph / LinkedIn -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cng-connect-vi3n.onrender.com/">
-    <meta property="og:title" content="CNG Connect | Smart Wayfinding">
-    <meta property="og:description" content="Real-time fuel status and journey planning for Chennai's CNG community. Built by Srinivas.">
+    <meta property="og:title" content="CNG Connect | Official Real-Time Station Map">
+    <meta property="og:description" content="Official Indian CNG community ecosystem. Built for drivers. Authorized Developer: Srinivas S.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
     
+    <!-- Professional PWA / Mobile tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -32,16 +38,15 @@
                 <option value="ta-IN">தமிழ்</option>
             </select>
 
-            <div class="nav-links">
+            <div class="nav-links" id="nav-links">
                 <a href="index.html" class="nav-link" id="nav-home">Home</a>
                 <a href="#features" class="nav-link" id="nav-features">Features</a>
                 <a href="#fleet" class="nav-link" id="nav-fleet">Fleet</a>
                 <a href="how-it-works.html" class="nav-link" id="nav-about">About</a>
                 <a href="plan-trip.html" class="nav-link" id="nav-plan">Plan Trip</a>
-                
-                <a href="login.html" class="btn btn-primary" id="btn-login"
-                    style="padding: 0.5rem 1.5rem; border-radius: 12px; font-size: 0.9rem;">Sign In</a>
+                <a href="login.html" class="btn btn-primary" id="btn-login" style="padding: 0.5rem 1.5rem; border-radius: 12px; font-size: 0.9rem;">Sign In</a>
             </div>
+            <div class="mobile-menu-btn" style="display: none;" onclick="toggleMobileMenu()">☰</div>
         </div>
     </nav>
 
@@ -469,6 +474,13 @@
                 devCredit: 'வடிவமைப்பு மற்றும் மேம்பாடு: <b style="color: #fbbf24;">ஸ்ரீனிவாஸ் எஸ்</b>'
             }
         };
+
+        function toggleMobileMenu() {
+            const nav = document.getElementById('nav-links');
+            nav.classList.toggle('active');
+            const btn = document.querySelector('.mobile-menu-btn');
+            btn.innerText = nav.classList.contains('active') ? '✕' : '☰';
+        }
 
         function changeLanguage() {
             const lang = document.getElementById('langSwitch').value;

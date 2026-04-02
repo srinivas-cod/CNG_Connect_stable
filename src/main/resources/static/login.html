@@ -3,9 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | CNG Connect</title>
-    <meta name="description" content="Sign in to CNG Connect for real-time CNG station status and trip planning.">
+    <title>Login | Official CNG Connect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Secure login for the official CNG Connect station Monitoring platform. Authorized by Srinivas S.">
+    <meta name="author" content="Srinivas S">
+    <meta name="robots" content="index, follow">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2950/2950660.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -947,7 +952,7 @@
         function friendlyError(code) {
             const map = {
                 'auth/user-not-found': 'No account found with this email. Please sign up first.',
-                'auth/wrong-password': 'Incorrect password. Try again or reset it.',
+                'auth/wrong-password': 'Incorrect password. If you signed up with Google, use that button instead.',
                 'auth/invalid-credential': 'Invalid email or password. Please check and try again.',
                 'auth/email-already-in-use': 'This email is already registered. Try signing in instead.',
                 'auth/weak-password': 'Password is too weak. Use at least 6 characters.',
@@ -957,9 +962,13 @@
                 'auth/popup-closed-by-user': 'Google sign-in was cancelled.',
                 'auth/popup-blocked': 'Popup was blocked by your browser. Allow popups and try again.',
                 'auth/cancelled-popup-request': 'Sign-in cancelled. Please try again.',
-                'auth/account-exists-with-different-credential': 'An account already exists with a different sign-in method for this email.'
+                'auth/account-exists-with-different-credential': 'An account already exists with a different sign-in method. Try using Google if you previously linked it.',
+                'auth/operation-not-allowed': 'Email/Password sign-in is not enabled in Firebase Console. Please enable it in the Auth section.',
+                'auth/user-disabled': 'This account has been disabled. Please contact support.',
+                'auth/user-token-expired': 'Session expired. Please sign in again.',
+                'auth/requires-recent-login': 'Please log out and log in again before making this change.'
             };
-            return map[code] || 'Something went wrong. Please try again.';
+            return map[code] || `Something went wrong (${code}). Please check your Firebase Console settings.`;
         }
 
         // ====================== SIGN IN (Email/Password) ======================
@@ -978,9 +987,14 @@
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(email, pass);
                 const user = userCredential.user;
+                
+                // Clear any previous session data
+                localStorage.clear();
+                
                 localStorage.setItem('userRole', 'USER');
                 localStorage.setItem('userName', user.displayName || email.split('@')[0]);
                 localStorage.setItem('userEmail', user.email);
+                
                 showToast(L.toastLoginSuccess, 'success');
                 setTimeout(() => { window.location.href = 'map.html'; }, 800);
             } catch (e) {

@@ -18,10 +18,11 @@ public class CngBackendApplication {
     @Bean
     public CommandLineRunner initData(StationRepository repository) {
         return args -> {
-            repository.deleteAll(); 
-            System.out.println("Seeding Strategic Hubs (60+ Hubs Across TN, AP, KA, KL, TS)...");
-
-            List<Station> stations = List.of(
+            try {
+                long count = repository.count();
+                if (count == 0) {
+                    System.out.println("No stations found. Seeding Strategic Hubs (60+ Hubs Across India)...");
+                    List<Station> stations = List.of(
                 // --- CHENNAI HUB (Strategic & Local) ---
                 createStation("Torrent Gas - Kohinoor (Mount Road)", 13.0642, 80.2642, "Available", 5, "CNG", null, null, null, true, "ADMIN"),
                 createStation("Torrent Gas - Adyar (LB Road)", 12.9916, 80.2541, "Available", 10, "CNG", null, null, null, false, "USER"),
@@ -177,10 +178,16 @@ public class CngBackendApplication {
                 // --- UTTAR PRADESH HUB (New) ---
                 createStation("Green Gas - Lucknow Gomti Nagar", 26.8467, 80.9461, "Available", 10, "CNG", null, null, "Green Gas", true, "ADMIN"),
                 createStation("Adani Total - Noida Sector 62", 28.6253, 77.3685, "Available", 5, "CNG", null, null, "Adani Total", true, "ADMIN")
-            );
-
-            repository.saveAll(stations);
-            System.out.println("Data Seeding Complete. Ready for Nationwide launch (9 Regions).");
+                    );
+                    repository.saveAll(stations);
+                    System.out.println("Data Seeding Complete. Ready for Nationwide launch (9 Regions).");
+                } else {
+                    System.out.println("Stations already exist (" + count + "). Skipping seeding.");
+                }
+            } catch (Exception e) {
+                System.err.println("CRITICAL ERROR during Data Seeding: " + e.getMessage());
+                System.err.println("Please check your MONGODB_URI environment variable.");
+            }
         };
     }
 

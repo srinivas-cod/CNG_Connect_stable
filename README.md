@@ -1,30 +1,60 @@
-# How to Run CNG Connect Backend
+🛢️ CNG Connect — Location & Navigation Platform
 
-This is a Spring Boot application.
+A full-stack web application that helps users locate nearby CNG (Compressed Natural Gas) 
+stations using real-time GPS-based routing and an interactive map interface.
+Built as a prototype to demonstrate how a national CNG monitoring system could work 
+at scale across India.
 
-## Prerequisites
-1.  **Java 17 Development Kit (JDK 17)** must be installed.
-    *   Verify with: `java -version`
-2.  **Maven** must be installed (since the wrapper is missing).
-    *   Verify with: `mvn -version`
-    *   Install from: https://maven.apache.org/download.cgi
+ 🌐 Live Demo
+🔗 [https://cng-connect-vi3n.onrender.com](https://cng-connect-vi3n.onrender.com)
 
-## Running the Application
+ 🚀 Features
 
-Open a terminal in this directory and run:
+- 📍 Detect user's current location via GPS
+- 🗺️ Display nearby CNG stations on an interactive map (Leaflet.js)
+- 🔄 REST API backend built with Spring Boot
+- 🧭 Turn-by-turn route navigation to selected station
+- 💾 Station data stored and managed via MongoDB
+- 🌐 Deployed live on Render
+- 🇮🇳 Bilingual support — English & Tamil
+- 📊 Real-time queue status reporting by drivers
+- ⏱️ TTR (Total Time to Refill) algorithm combining live traffic + queue wait
+- 🚛 Fleet & enterprise dashboard (in development)
 
-```bash
-mvn spring-boot:run
-```
+ 🛠️ Tech Stack
 
-Or, to build a JAR file:
 
-```bash
-mvn clean install
-java -jar target/cng-backend-1.0.0.jar
-```
+Frontend - HTML, CSS, JavaScript, Leaflet.js 
+Backend - Java, Spring Boot, REST APIs 
+Database - MongoDB 
+Deployment - Render 
+Tools -  Git, Postman, Maven 
 
-## Troubleshooting
--   **"mvn is not recognized"**: You need to install Maven and add it to your system PATH.
--   **"Address already in use"**: Make sure no other application is running on port 8080.
--   **MongoDB Errors**: Check `src/main/resources/application.properties` to ensure the database URI is correct and your IP is allowed in MongoDB Atlas.
+⚙️ Prerequisites
+
+- Java 17 (JDK)
+- Maven
+- MongoDB (local or Atlas URI)
+
+🔧 Troubleshooting
+
+ Error  & Fix 
+ `mvn not recognized` - Install Maven and add to system PATH 
+ `Address already in use` - Another app is using port 8080 — stop it or change the port 
+ MongoDB connection error - Check your DB URI in `application.properties` 
+
+🚀 Future Scope
+
+- Government integration for real-time station data across India
+- Mobile app (Android/iOS)
+- Predictive queue analytics using ML
+- Full fleet dispatcher dashboard
+
+ 👤 Author
+
+**Srinivas S** — ECE Student, RMD Engineering College  
+[LinkedIn](https://www.linkedin.com/in/srinivas-s-759879202/) | [GitHub](https://github.com/srinivas-cod) | 📧 srinivassriraman0923@gmail.com
+
+ 📄 License
+This project is for educational and demonstration purposes only.  
+© 2026 Srinivas S. All rights reserved.

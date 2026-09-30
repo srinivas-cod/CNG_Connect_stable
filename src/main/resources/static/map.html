@@ -1736,6 +1736,256 @@
       }
     });
   </script>
+
+  <!-- ==================== AI SMART ASSISTANT WIDGET ==================== -->
+  <style>
+    .ai-fab {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 9999;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Outfit', sans-serif;
+    }
+    .ai-fab:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.7);
+    }
+    .ai-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(2, 6, 23, 0.7);
+      backdrop-filter: blur(8px);
+      justify-content: center;
+      align-items: flex-end;
+    }
+    @media (min-width: 640px) {
+      .ai-modal {
+        align-items: center;
+      }
+    }
+    .ai-card {
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 24px 24px 0 0;
+      width: 100%;
+      max-width: 540px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      animation: slideUp 0.3s ease-out;
+    }
+    @media (min-width: 640px) {
+      .ai-card {
+        border-radius: 24px;
+      }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .ai-header {
+      padding: 20px 24px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .ai-chip {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .ai-chip:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+    .ai-response-box {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+  </style>
+
+  <!-- Floating Trigger Button -->
+  <button class="ai-fab" onclick="openAiAssistant()">
+    <span style="font-size: 1.3rem;">🤖</span>
+    <span>AI Co-Pilot</span>
+  </button>
+
+  <!-- AI Assistant Modal -->
+  <div class="ai-modal" id="aiModal" onclick="if(event.target===this)closeAiAssistant()">
+    <div class="ai-card">
+      <div class="ai-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="width: 40px; height: 40px; background: rgba(16, 185, 129, 0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">
+            🤖
+          </div>
+          <div>
+            <div style="color: white; font-weight: 700; font-size: 1.1rem;">AI Smart Assistant</div>
+            <div style="color: #10b981; font-size: 0.78rem; font-weight: 500;">Free Real-Time Route & Queue Intelligence</div>
+          </div>
+        </div>
+        <button onclick="closeAiAssistant()" style="background: none; border: none; color: #94a3b8; font-size: 1.5rem; cursor: pointer;">✕</button>
+      </div>
+
+      <!-- Quick Action Chips -->
+      <div style="padding: 14px 24px 0; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;">
+        <button class="ai-chip" onclick="askAiChip('⚡ I have 20% CNG. Which station is nearest and safe?')">⚡ 20% Fuel Emergency</button>
+        <button class="ai-chip" onclick="askAiChip('🚥 Which station currently has the lowest queue wait?')">🚥 Lowest Queue</button>
+        <button class="ai-chip" onclick="askAiChip('📍 Travelling to Tambaram - best CNG stop?')">📍 Route Recommendation</button>
+      </div>
+
+      <!-- AI Response & Chat Body -->
+      <div class="ai-response-box" id="aiResponseBox">
+        <div style="background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(255, 255, 255, 0.15); border-radius: 16px; padding: 20px; text-align: center;">
+          <p style="margin: 0 0 10px; font-weight: 600; color: #f8fafc;">Hello! How can I assist your journey today?</p>
+          <p style="margin: 0; font-size: 0.85rem; color: #94a3b8;">Click a quick prompt above or ask any question about nearby station queues, distances, or fuel availability.</p>
+        </div>
+      </div>
+
+      <!-- Input Footer -->
+      <div style="padding: 16px 24px 24px; background: rgba(255, 255, 255, 0.02); border-top: 1px solid rgba(255, 255, 255, 0.08);">
+        <form onsubmit="submitAiForm(event)" style="display: flex; gap: 10px;">
+          <input type="text" id="aiPromptInput" placeholder="Ask AI co-pilot (e.g. Find 0-wait station)..." required 
+                 style="flex: 1; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 14px; padding: 14px 18px; color: white; outline: none; font-family: 'Outfit', sans-serif;">
+          <button type="submit" id="aiSendBtn" style="background: #10b981; color: white; border: none; padding: 0 20px; border-radius: 14px; font-weight: 700; cursor: pointer; font-family: 'Outfit', sans-serif; transition: 0.2s;">
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openAiAssistant() {
+      document.getElementById('aiModal').style.display = 'flex';
+    }
+    function closeAiAssistant() {
+      document.getElementById('aiModal').style.display = 'none';
+    }
+    function askAiChip(text) {
+      document.getElementById('aiPromptInput').value = text;
+      submitAiForm(new Event('submit'));
+    }
+
+    async function submitAiForm(e) {
+      e.preventDefault();
+      const input = document.getElementById('aiPromptInput');
+      const btn = document.getElementById('aiSendBtn');
+      const box = document.getElementById('aiResponseBox');
+
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      btn.disabled = true;
+      btn.innerText = 'Analyzing...';
+      
+      // Render user prompt bubble
+      box.innerHTML = `
+        <div style="margin-bottom: 16px; text-align: right;">
+          <span style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 16px; border-radius: 18px 18px 2px 18px; display: inline-block; font-size: 0.9rem;">
+            ${userText}
+          </span>
+        </div>
+        <div style="display: flex; gap: 12px; align-items: flex-start;" id="aiLoadingIndicator">
+          <div style="width: 32px; height: 32px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center;">🤖</div>
+          <div style="color: #94a3b8; font-size: 0.88rem; padding-top: 6px;">Analyzing live station queues & GPS location...</div>
+        </div>
+      `;
+
+      let userLat = 13.0827;
+      let userLng = 80.2707;
+      if (typeof userMarker !== 'undefined' && userMarker) {
+        userLat = userMarker.getLatLng().lat;
+        userLng = userMarker.getLatLng().lng;
+      }
+
+      try {
+        const response = await fetch('/api/ai/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt: userText, lat: userLat, lng: userLng })
+        });
+        const data = await response.json();
+
+        let recText = data.recommendation || "Recommended station details retrieved.";
+        // Replace bold markdown ** with <b>
+        recText = recText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+
+        let stationsHtml = '';
+        if (data.nearbyStations && data.nearbyStations.length > 0) {
+          stationsHtml = '<div style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">';
+          data.nearbyStations.slice(0, 3).forEach(s => {
+            const badgeBg = s.status === 'Available' ? 'rgba(34,197,94,0.15)' : (s.status === 'Out of Stock' ? 'rgba(244,63,94,0.15)' : 'rgba(59,130,246,0.15)');
+            const badgeColor = s.status === 'Available' ? '#4ade80' : (s.status === 'Out of Stock' ? '#fb7185' : '#60a5fa');
+            stationsHtml += `
+              <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 700; color: white; font-size: 0.9rem;">${s.name}</div>
+                  <div style="font-size: 0.78rem; color: #94a3b8;">📍 ${s.distanceKm} km away | 🚥 Wait: ${s.queueTime}m</div>
+                </div>
+                <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 0.75rem; padding: 4px 10px; border-radius: 8px; font-weight: 600;">
+                  ${s.status}
+                </span>
+              </div>
+            `;
+          });
+          stationsHtml += '</div>';
+        }
+
+        box.innerHTML = `
+          <div style="margin-bottom: 16px; text-align: right;">
+            <span style="background: #1e293b; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 10px 16px; border-radius: 18px 18px 2px 18px; display: inline-block; font-size: 0.9rem;">
+              ${userText}
+            </span>
+          </div>
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 18px; padding: 18px; color: #e2e8f0;">
+            <div style="display: flex; align-items: center; gap: 8px; color: #34d399; font-weight: 700; margin-bottom: 8px;">
+              <span>🤖 AI Recommendation</span>
+            </div>
+            <div>${recText}</div>
+            ${stationsHtml}
+          </div>
+        `;
+      } catch (err) {
+        console.error("AI Error", err);
+        box.innerHTML = `<div style="color: #fb7185; padding: 10px;">Could not connect to AI service. Please try again.</div>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Send';
+        input.value = '';
+      }
+    }
+  </script>
 </body>
 
 </html>
+

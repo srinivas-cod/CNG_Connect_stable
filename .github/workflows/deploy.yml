@@ -1,0 +1,52 @@
+name: CNG Connect CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Build & Verify (CI)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build and Package with Maven
+        run: mvn clean package -DskipTests
+
+  deploy:
+    name: Trigger Render Deployment (CD)
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Render Deploy Webhook
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not set in GitHub Repository Secrets!"
+            echo "Please add RENDER_DEPLOY_HOOK_URL under GitHub Repo -> Settings -> Secrets and variables -> Actions"
+            exit 1
+          fi
+          echo "Triggering auto-deployment on Render..."
+          response=$(curl -s -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+          http_code="${response:${#response}-3}"
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "Render deployment triggered successfully (HTTP $http_code)."
+          else
+            echo "::error::Failed to trigger Render deployment (HTTP $http_code)."
+            exit 1
+          fi

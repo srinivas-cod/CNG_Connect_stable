@@ -381,8 +381,11 @@
 
     .panel-footer {
       padding: 15px;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.95);
       border-top: 1px solid #e2e8f0;
+      overflow-y: auto;
+      max-height: 280px;
+      flex-shrink: 0;
     }
 
     .action-btn {
@@ -1935,7 +1938,7 @@
     .ai-fab {
       position: fixed;
       bottom: 25px;
-      right: 25px;
+      left: 25px;
       z-index: 9999;
       background: linear-gradient(135deg, #10b981, #059669);
       color: white;

@@ -798,7 +798,13 @@
 
     <div class="panel-footer">
       <div id="routeStats" class="route-meta" style="display:none">
-        Dist: <span id="distVal">--</span> | Est: <span id="timeVal">--</span>
+        <div>Dist: <span id="distVal">--</span> | Est: <span id="timeVal">--</span></div>
+        <div style="background: rgba(0,0,0,0.1); border-radius: 6px; height: 6px; width: 100%; margin: 8px 0 4px; overflow: hidden;">
+          <div id="trackingProgressFill" style="background: linear-gradient(90deg, #ef4444, #dc2626); height: 100%; width: 0%; transition: width 0.1s;"></div>
+        </div>
+        <button class="action-btn btn-primary" id="trackTripBtn" onclick="toggleLiveTripTracking()" style="background: linear-gradient(135deg, #ef4444, #dc2626); margin-top: 6px; margin-bottom: 0;">
+          ▶️ Start Real-Time Live Tracking
+        </button>
       </div>
       <button class="action-btn btn-primary" id="generateBtn">Explore Stations</button>
       <button class="action-btn btn-outline" id="clearBtn">Clear All</button>
@@ -1566,6 +1572,7 @@
     };
 
     document.getElementById('clearBtn').onclick = () => {
+      resetLiveTripTracking();
       const isTamil = document.getElementById('voiceLang').value === 'ta-IN';
       const labels = uiLabels[isTamil ? 'ta-IN' : 'en-US'];
 
@@ -1578,6 +1585,164 @@
       document.getElementById('routeStats').style.display = 'none';
       renderStationMarkers();
     };
+
+    /* ==================== ANIMATED REAL-TIME VEHICLE TRACKING ENGINE ==================== */
+    let animVehicleMarker = null;
+    let traveledPolyline = null;
+    let animTimer = null;
+    let animIndex = 0;
+    let isTrackingActive = false;
+
+    function toggleLiveTripTracking() {
+      if (!lastCoords || lastCoords.length === 0) {
+        alert("Please search a destination or plan a trip first.");
+        return;
+      }
+      if (isTrackingActive) {
+        pauseLiveTripTracking();
+      } else {
+        startLiveTripTracking();
+      }
+    }
+
+    function startLiveTripTracking() {
+      if (!lastCoords || lastCoords.length === 0) return;
+
+      isTrackingActive = true;
+      const btn = document.getElementById('trackTripBtn');
+      if (btn) btn.innerHTML = '⏸️ Pause Live Tracking';
+
+      // Initialize traveled red polyline
+      if (!traveledPolyline) {
+        traveledPolyline = L.polyline([], {
+          color: '#dc2626', // Solid Red Traveled Trail
+          weight: 7,
+          opacity: 0.95
+        }).addTo(map);
+      }
+
+      // Initialize vehicle marker
+      if (!animVehicleMarker) {
+        const cabIcon = L.divIcon({
+          className: 'vehicle-marker-icon',
+          html: `<div style="font-size: 28px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); transform: scaleX(-1);">🚕</div>`,
+          iconSize: [36, 36],
+          iconAnchor: [18, 18]
+        });
+        animVehicleMarker = L.marker([lastCoords[0].lat, lastCoords[0].lng], { icon: cabIcon, zIndexOffset: 2000 }).addTo(map);
+      }
+
+      if (animTimer) clearInterval(animTimer);
+
+      const totalPoints = lastCoords.length;
+      animTimer = setInterval(() => {
+        if (animIndex >= totalPoints) {
+          concludeTripArrival();
+          return;
+        }
+
+        const currentCoord = lastCoords[animIndex];
+        const latLng = L.latLng(currentCoord.lat, currentCoord.lng);
+
+        // 1. Move vehicle marker smoothly
+        animVehicleMarker.setLatLng(latLng);
+
+        // 2. Draw solid red traveled trail
+        traveledPolyline.addLatLng(latLng);
+
+        // 3. Pan map smoothly to track vehicle
+        if (animIndex % 4 === 0) {
+          map.panTo(latLng, { animate: true, duration: 0.3 });
+        }
+
+        // 4. Update progress bar
+        const progressPercent = Math.round(((animIndex + 1) / totalPoints) * 100);
+        const progressEl = document.getElementById('trackingProgressFill');
+        if (progressEl) progressEl.style.width = progressPercent + '%';
+
+        animIndex++;
+      }, 100); // Smooth animation step velocity
+    }
+
+    function pauseLiveTripTracking() {
+      isTrackingActive = false;
+      if (animTimer) clearInterval(animTimer);
+      const btn = document.getElementById('trackTripBtn');
+      if (btn) btn.innerHTML = '▶️ Resume Live Tracking';
+    }
+
+    function concludeTripArrival() {
+      pauseLiveTripTracking();
+      isTrackingActive = false;
+
+      const btn = document.getElementById('trackTripBtn');
+      if (btn) btn.innerHTML = '🎉 Destination Arrived!';
+
+      const lang = document.getElementById('voiceLang').value;
+      const isTamil = lang === 'ta-IN';
+      const arrivalMsg = isTamil ? "சேருமிடம் வந்தடைந்தது! பயணம் வெற்றிகரமாக முடிந்தது." : "Destination Arrived! Your trip has concluded successfully.";
+
+      speak(arrivalMsg);
+
+      const destName = waypoints[waypoints.length - 1] ? waypoints[waypoints.length - 1].name : "Destination";
+      showArrivalModal(destName);
+    }
+
+    function showArrivalModal(destName) {
+      let modal = document.getElementById('arrivalModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'arrivalModal';
+        modal.style.cssText = 'position:fixed; inset:0; z-index:10001; background:rgba(2,6,23,0.85); backdrop-filter:blur(10px); display:flex; justify-content:center; align-items:center;';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div style="background:#0f172a; border:2px solid #22c55e; border-radius:24px; padding:32px; max-width:440px; width:90%; text-align:center; color:white; box-shadow:0 0 50px rgba(34,197,94,0.3); font-family: 'Outfit', sans-serif;">
+          <div style="font-size:3.5rem; margin-bottom:12px;">🏁</div>
+          <h2 style="color:#4ade80; margin:0 0 8px; font-size:1.6rem; font-weight: 700;">Destination Arrived!</h2>
+          <p style="color:#cbd5e1; font-size:0.95rem; margin-bottom:20px; line-height: 1.5;">You have reached <b>${destName}</b>. The live tracking session has automatically concluded.</p>
+          <div style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:15px; margin-bottom:24px; display:flex; justify-content:space-around;">
+            <div>
+              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600;">TRAVELED TRAIL</div>
+              <div style="font-size:1.1rem; font-weight:700; color:#ef4444; margin-top: 4px;">100% Solid Red</div>
+            </div>
+            <div style="border-left:1px solid rgba(255,255,255,0.1);"></div>
+            <div>
+              <div style="font-size:0.75rem; color:#94a3b8; font-weight:600;">STATUS</div>
+              <div style="font-size:1.1rem; font-weight:700; color:#4ade80; margin-top: 4px;">Concluded</div>
+            </div>
+          </div>
+          <button onclick="closeArrivalModal()" style="background:#22c55e; color:white; border:none; padding:14px 28px; border-radius:14px; font-weight:700; font-size:1rem; cursor:pointer; width:100%; font-family:'Outfit',sans-serif;">
+            Conclude Trip & Return to Map
+          </button>
+        </div>
+      `;
+      modal.style.display = 'flex';
+    }
+
+    function closeArrivalModal() {
+      const modal = document.getElementById('arrivalModal');
+      if (modal) modal.style.display = 'none';
+      resetLiveTripTracking();
+    }
+
+    function resetLiveTripTracking() {
+      pauseLiveTripTracking();
+      if (animVehicleMarker) {
+        map.removeLayer(animVehicleMarker);
+        animVehicleMarker = null;
+      }
+      if (traveledPolyline) {
+        map.removeLayer(traveledPolyline);
+        traveledPolyline = null;
+      }
+      animIndex = 0;
+      const btn = document.getElementById('trackTripBtn');
+      if (btn) btn.innerHTML = '▶️ Start Real-Time Live Tracking';
+      const progressEl = document.getElementById('trackingProgressFill');
+      if (progressEl) progressEl.style.width = '0%';
+    }
 
     document.getElementById('togglePanel').onclick = function () {
       const p = document.getElementById('sidePanel');

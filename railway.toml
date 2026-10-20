@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "java -jar -Dserver.port=$PORT target/*.jar"
+healthcheckPath = "/api/ping"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
